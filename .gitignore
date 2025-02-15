@@ -1,0 +1,9 @@
+rtl/obj_dir
+rtl/.stamp.verilate
+rtl/waveform.vcd
+rtl/decoder_old.sv
+rtl/alu.sv
+rtl/register_file.sv
+rtl/load_store_unit.sv
+
+utils

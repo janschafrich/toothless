@@ -1,0 +1,57 @@
+
+package toothless_pkg;
+
+    parameter R_TYPE = 7'b0110011;
+    parameter I_TYPE = 7'b0010011;
+    parameter S_TYPE = 7'b0100011;
+    parameter B_TYPE = 7'b1100011;
+
+
+
+    parameter ALU_OP_WIDTH = 5;
+
+    typedef enum logic [ALU_OP_WIDTH-1:0] {
+
+        // arithmetic operations
+        ALU_ADD     = 5'b0_0000,
+        ALU_SUB     = 5'b0_0001,
+        ALU_ADDU    = 5'b0_0010,
+        ALU_SUBU    = 5'b0_0011,
+
+        // logical 
+        ALU_AND     = 5'b0_0100,
+        ALU_OR      = 5'b0_0101,
+        ALU_XOR     = 5'b0_0110,
+
+        // shifts
+        ALU_SRL     = 5'b0_1000,
+        ALU_SRA     = 5'b0_1001,
+        ALU_SLL     = 5'b0_1010,
+        
+        // comparisons
+        ALU_LTS     = 5'b1_0000,
+        ALU_LTU     = 5'b1_0001,
+        ALU_LES     = 5'b1_0010,
+        ALU_LEU     = 5'b1_0011,
+        ALU_GTS     = 5'b1_0100,
+        ALU_GTU     = 5'b1_0101,
+        ALU_GES     = 5'b1_0110,
+        ALU_GEU     = 5'b1_0111,
+        ALU_EQ      = 5'b1_1001,
+        ALU_NE      = 5'b1_1010,
+
+        ALU_SLT     = 5'b1_1100,
+        ALU_SLTU    = 5'b1_1101
+
+    } alu_opcode_e;
+
+
+    parameter OP_A_REG      = 2'b00;
+    parameter OP_A_CURPC    = 2'b01;
+    parameter OP_A_IMM      = 2'b10;
+
+    parameter OP_B_REG      = 2'b00;
+    parameter OP_B_IMM      = 2'b10;
+
+
+endpackage
