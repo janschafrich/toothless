@@ -1,9 +1,18 @@
 rtl/obj_dir
 rtl/.stamp.verilate
 rtl/waveform.vcd
+
+
+rtl/sim_build
+rtl/results.xml
+rtl/dump.vcd
+
 rtl/decoder_old.sv
 rtl/alu.sv
 rtl/register_file.sv
 rtl/load_store_unit.sv
+
+testbenches/__pycache__
+
 
 utils
