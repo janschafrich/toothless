@@ -1,8 +1,10 @@
 # Makefile
 
-export PYTHONPATH := $(PWD)/../testbenches:$(PYTHONPATH)
+export PYTHONPATH 		:= $(PWD)/../testbenches:$(PYTHONPATH)
+# export VERILATOR_ROOT 	:= /home/jscha/projects/verilator
+# export $(PATH)				:= $(VERILATOR_ROOT)/bin:$(PATH)
 
-DUT				?= program_counter
+DUT				?=
 SIM             ?= verilator
 TOPLEVEL_LANG   ?= verilog
 EXTRA_ARGS      += --trace --trace-structs
