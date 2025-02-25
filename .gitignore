@@ -9,6 +9,7 @@ rtl/dump.vcd
 
 rtl/decoder_old.sv
 rtl/alu.sv
+rtl/alu_old.sv
 rtl/load_store_unit.sv
 
 testbenches/__pycache__

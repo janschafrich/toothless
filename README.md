@@ -17,26 +17,26 @@ lsu
 regfile
 
 
-# Steps
+# Simulation cocotb + Verilator Simulation (Verilator >= 5.22)
 
-Simulation: Verilator which version Ubtuntu 22.04?
+Setup Verilator Path 
 
-
-# Setup Simulation
-
-Verilator Path 
 ```
-export NEMO_DIR=/home/jscha/projects/nemo
-export VERILATOR_ROOT=$NEMO_DIR/verilator
+export VERILATOR_ROOT=/home/jscha/projects/verilator
 export PATH=$VERILATOR_ROOT/bin:$PATH
 ```
 
-Launch Simulation (Verilator version 4.21)
+Launch program_counter
 
 ```
 cd rtl
-make
+make DUT=alu
 ```
+
+# TODO
+
+
+
 
 
 

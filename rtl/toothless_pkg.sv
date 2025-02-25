@@ -29,8 +29,8 @@ package toothless_pkg;
         ALU_SLL     = 5'b0_1010,
         
         // comparisons
-        ALU_LTS     = 5'b1_0000,
-        ALU_LTU     = 5'b1_0001,
+        ALU_SLT     = 5'b1_0000,
+        ALU_SLTU    = 5'b1_0001,
         ALU_LES     = 5'b1_0010,
         ALU_LEU     = 5'b1_0011,
         ALU_GTS     = 5'b1_0100,
@@ -38,10 +38,9 @@ package toothless_pkg;
         ALU_GES     = 5'b1_0110,
         ALU_GEU     = 5'b1_0111,
         ALU_EQ      = 5'b1_1001,
-        ALU_NE      = 5'b1_1010,
+        ALU_NE      = 5'b1_1010
 
-        ALU_SLT     = 5'b1_1100,
-        ALU_SLTU    = 5'b1_1101
+
 
     } alu_opcode_e;
 
