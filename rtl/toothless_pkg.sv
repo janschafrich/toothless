@@ -5,8 +5,13 @@ package toothless_pkg;
     parameter I_TYPE = 7'b0010011;
     parameter S_TYPE = 7'b0100011;
     parameter B_TYPE = 7'b1100011;
+    // parameter U_TYPE =   5'b10111;
 
+    parameter LUI   = 7'b011_0111;
+    parameter AUIPC = 7'b001_0111;
 
+    parameter JAL   = 7'b110_1111;
+    parameter JALR  = 7'b110_0111;
 
     parameter ALU_OP_WIDTH = 5;
 
@@ -39,8 +44,6 @@ package toothless_pkg;
         ALU_GEU     = 5'b1_0111,
         ALU_EQ      = 5'b1_1001,
         ALU_NE      = 5'b1_1010
-
-
 
     } alu_opcode_e;
 

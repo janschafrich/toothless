@@ -35,6 +35,8 @@ make DUT=alu
 
 # TODO
 
+- where to define which register to access
+- python central single definiton of constants
 
 
 
