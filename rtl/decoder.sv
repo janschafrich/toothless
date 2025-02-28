@@ -17,13 +17,26 @@ module decoder #(
     output logic [DATA_WIDTH-1:0]   imm_o,           // sign/zero extended immediate value from current instruction
     output logic                    imm_valid_o,       // whether current instruction has an immediate value
 
-    // register idea
+    // register file signals
     output logic        rs1_used_o,
     output logic        rs2_used_o,
     output logic        rd_used_o,                 // need register write
     output logic [4:0]  rs1_o,
     output logic [4:0]  rs2_o, 
     output logic [4:0]  rd_o,
+
+    // controller signals
+    output logic [1:0]  rf_wp_mux_sel_o,           // write source: 00 ALU, 01 PC
+    output logic [1:0]  alu_result_mux_sel_o,      // where should the ALU result go: 00 RF, 01 PC, 10 LSU
+
+
+    // program counter signals
+    output logic [1:0]  ctrl_transfer_instr_o,      // current instr is control transfer, 00 none, 01 jump, 10 branch
+
+    // load store unit signals
+    output logic        data_req_o,                   // request data memory access
+    output logic [1:0]  data_type_o,                // word, half word, byte for LSU
+    output logic        data_we_o,                    // write or read to memory
 
     output logic instr_invalid_o                    // everything not part of RV32I is invalid
 );
@@ -43,6 +56,14 @@ always_comb begin: instruction_decoder
     rs1_o       = instr_i[19:15];
     rs2_o       = instr_i[24:20];
     rd_o        = instr_i[11:7];
+
+    rf_wp_mux_sel_o         = 2'b00;        // ALU
+    alu_result_mux_sel_o    = ALU_RESULT_SEL_RF;        // RF
+    ctrl_transfer_instr_o   = CTRL_TRSFR_SEL_NONE;        // none
+
+    data_req_o  = 1'b0;
+    data_type_o = 2'b10;                    // word
+    data_we_o     = 1'b0;                   // load
 
     unique case (instr_i[6:0])
 
@@ -174,7 +195,7 @@ always_comb begin: instruction_decoder
             endcase
         end
 
-        LUI, AUIPC: begin
+        OPC_LUI, OPC_AUIPC: begin
 
             rd_used_o   = 1'b1;
 
@@ -207,51 +228,119 @@ always_comb begin: instruction_decoder
             rs1_used_o  = 1'b1;
             rs2_used_o  = 1'b1;
 
+            alu_op_a_mux_sel_o  = OP_A_REG;
+            alu_op_b_mux_sel_o  = OP_B_REG;
+
+            ctrl_transfer_instr_o = CTRL_TRSFR_SEL_BRANCH;
+
+            // offset, to program counter ?
             imm_valid_o = 1'b1;
-            imm_o[31:13]= {19{1'b0}};
-            imm_o[12]   = instr_i[31];
+            imm_o[31:12]= { 20{instr_i[31]} };
             imm_o[11]   = instr_i[7];
             imm_o[10:5] = instr_i[30:25];
             imm_o[4:1]  = instr_i[11:8];
             imm_o[0]    = 1'b0;
 
             unique case (instr_i[14:12])
+                3'b000:     alu_operator_o  = ALU_EQ;   // BEQ
+                3'b001:     alu_operator_o  = ALU_NE;   // BNE
+                3'b100:     alu_operator_o  = ALU_SLT;  // BLT
+                3'b101:     alu_operator_o  = ALU_GES;  // BGE
+                3'b110:     alu_operator_o  = ALU_SLTU; // BLTU
+                3'b111:     alu_operator_o  = ALU_GEU;  // BGEU
+                default:    instr_invalid_o = 1'b1;
 
-                3'b000: begin       // BEQ
+            endcase
+        end
 
-                end
+        OPC_JAL, OPC_JALR: begin
 
-                3'b001: begin       // BNE
+            alu_op_b_mux_sel_o      = OP_B_IMM;
 
-                end
+            ctrl_transfer_instr_o   = CTRL_TRSFR_SEL_JUMP;
+            rf_wp_mux_sel_o         = 2'b01;                // MUX select pc_plus4
+            alu_operator_o          = ALU_ADD;              // jump target
+            alu_result_mux_sel_o    = ALU_RESULT_SEL_PC;             // program counter
+            rd_used_o               = 1'b1;
+            imm_valid_o             = 1'b1;
 
-                3'b100: begin       // BLT
+            if (instr_i[3])     // JAL
+            begin
+                alu_op_a_mux_sel_o  = OP_A_CURPC;
+                imm_o[31:20]    = { 12{instr_i[31]} };
+                imm_o[19:12]    = instr_i[19:12];
+                imm_o[11]       = instr_i[20];
+                imm_o[10:1]     = instr_i[30:21];
+                imm_o[0]        = 1'b0;
+            end
+            else                // JALR
+            begin
+                rs1_used_o          = 1'b1;
+                alu_op_a_mux_sel_o  = OP_A_REG;
+                imm_o               = { {21{instr_i[31]}} , instr_i[30:20]};
+            end
+        end
 
-                end
 
-                3'b101: begin       // BGE
+        OPC_LOAD: begin
 
-                end
+            alu_operator_o          = ALU_ADD;
+            alu_op_a_mux_sel_o      = OP_A_REG;     // rs1 / base
+            alu_op_b_mux_sel_o      = OP_B_IMM;     // offset
+            alu_result_mux_sel_o    = ALU_RESULT_SEL_LSU;     // LSU
 
-                3'b110: begin       // BLTU
+            rs1_used_o  = 1'b1;                 // base address
+            rd_used_o   = 1'b1;                 // memory value destination
 
-                end
+            data_req_o  = 1'b1;
 
-                3'b111: begin       // BGEU
+            unique case (instr_i[13:12])
+                2'b00:  data_type_o = 2'b00;        // byte
+                2'b01:  data_type_o = 2'b01;        // halfword
+                2'b10:  data_type_o = 2'b10;        // word
+                2'b11:  instr_invalid_o = 1'b1;
+            endcase
 
-                end
+            imm_valid_o = 1'b1;
 
-                default: begin
-                    instr_invalid_o = 1'b1;
-                end
+            if (instr_i[14]) imm_o = { {20{1'b0}}, instr_i[31:20]};       // zero extend
+            else           imm_o = { { 21{instr_i[31]} }, instr_i[30:20]};  // sign extend
 
+        end
+
+
+        OPC_STORE: begin        // endianness
+            
+            alu_operator_o          = ALU_ADD;
+            alu_op_a_mux_sel_o      = OP_A_REG;
+            alu_op_b_mux_sel_o      = OP_B_IMM;
+            alu_result_mux_sel_o    = ALU_RESULT_SEL_LSU;
+
+            rs1_used_o          = 1'b1;
+            rs2_used_o          = 1'b1;
+
+            imm_valid_o     = 1'b1;
+            imm_o[31:11]    = {21{instr_i[31]}};    // sign extend
+            imm_o[10:5]     = instr_i[30:25];
+            imm_o[4:0]      = instr_i[11:7];
+
+            data_req_o      = 1'b1;
+            data_we_o       = 1'b1;
+
+            unique case (instr_i[14:12])
+                3'b000:     data_type_o = 2'b00;
+                3'b001:     data_type_o = 2'b01;
+                // 3'b010:     data_type_o = 2'b10;
+                default:    ; //instr_invalid_o = 1'b1;
             endcase
         end
 
 
 
+
+
         default: begin
-            instr_invalid_o = 1;
+            // instr_invalid_o = 1;
         end
     endcase
 

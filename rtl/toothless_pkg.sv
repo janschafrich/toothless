@@ -5,13 +5,14 @@ package toothless_pkg;
     parameter I_TYPE = 7'b0010011;
     parameter S_TYPE = 7'b0100011;
     parameter B_TYPE = 7'b1100011;
-    // parameter U_TYPE =   5'b10111;
+    parameter OPC_LOAD = 7'b0000011;
+    parameter OPC_STORE = 7'b0100011;
 
-    parameter LUI   = 7'b011_0111;
-    parameter AUIPC = 7'b001_0111;
+    parameter OPC_LUI   = 7'b011_0111;
+    parameter OPC_AUIPC = 7'b001_0111;
 
-    parameter JAL   = 7'b110_1111;
-    parameter JALR  = 7'b110_0111;
+    parameter OPC_JAL   = 7'b110_1111;
+    parameter OPC_JALR  = 7'b110_0111;
 
     parameter ALU_OP_WIDTH = 5;
 
@@ -54,6 +55,16 @@ package toothless_pkg;
 
     parameter OP_B_REG      = 2'b00;
     parameter OP_B_IMM      = 2'b10;
+
+    parameter CTRL_TRSFR_SEL_NONE    = 2'b00; 
+    parameter CTRL_TRSFR_SEL_JUMP    = 2'b01; 
+    parameter CTRL_TRSFR_SEL_BRANCH  = 2'b10; 
+
+    parameter ALU_RESULT_SEL_RF = 2'b00;
+    parameter ALU_RESULT_SEL_PC = 2'b01;
+    parameter ALU_RESULT_SEL_LSU = 2'b10;
+
+
 
 
 endpackage

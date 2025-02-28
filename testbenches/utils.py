@@ -4,11 +4,22 @@ import numpy as np
 from constants_pkg import *
 
 
-def assert_response(signal, expected_response : int):
-    
+_current_instr = None
+
+
+def set_current_instr(instr):
+    """Sets the current instruction globally."""
+    global _current_instr
+    _current_instr = instr
+
+
+
+def assert_response(signal, expected_response: int):
+    """Assertion function that automatically prints the current instruction if an error occurs."""
     if expected_response < 0:
         assert signal.value.signed_integer == expected_response, \
-            f"Expected {signal._name}={(expected_response)}, got {signal._name}={(signal.value)}" 
+            f"Expected {signal._name}={(expected_response)}, got {signal._name}={(signal.value)}"
     else:
-        assert signal.value == int(expected_response), \
-            f"Expected {signal._name}={(expected_response)}, got {signal._name}={(signal.value)}" 
+        assert int(signal.value) == int(expected_response), \
+            f"Expected {signal._name}={(expected_response)}, got {signal._name}={(signal.value)}\n" \
+            f"Offending instruction: {_current_instr.get_formatted_fields() if _current_instr else 'No instruction set'}"

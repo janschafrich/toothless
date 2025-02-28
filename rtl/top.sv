@@ -14,9 +14,11 @@ module top #(
 );
 
     logic branch_tkn;
-    logic is_jalr;
+    logic [31:0] offset;        // immediate from decoder
+    logic [1:0] ctrl_transfer_instr;
     logic [31:0] tgt_addr;
     logic [31:0] pc;
+    logic [31:0] pc_plus4;
     logic [31:0] instr;
 
     // register file
@@ -32,12 +34,14 @@ module top #(
     logic                  we_a;
 
     program_counter #() program_counter_i (
-	    .clk_i          (clk_i),
-	    .rst_ni         (rst_ni),
+	    .clk            (clk_i),
+	    .rst_n          (rst_ni),
+        .ctrl_transfer_instr_i(ctrl_transfer_instr),
+        .offset_i       (offset),
 	    .branch_tkn_i   (branch_tkn), 
-        .is_jalr_i      (is_jalr),
 	    .tgt_addr_i     (tgt_addr),
-	    .pc_o           (pc)
+	    .pc_o           (pc),
+        .pc_plus4_o     (pc_plus4)
     );
 
     instruction_rom #() instruction_rom_i (
