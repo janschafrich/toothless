@@ -17,7 +17,7 @@ lsu
 regfile
 
 
-# Simulation cocotb + Verilator Simulation (Verilator >= 5.22)
+# Simulation cocotb (Python) + Verilator (Verilator >= 5.22)
 
 Setup Verilator Path 
 
@@ -26,11 +26,21 @@ export VERILATOR_ROOT=/home/jscha/projects/verilator
 export PATH=$VERILATOR_ROOT/bin:$PATH
 ```
 
-Launch program_counter
+Check for Syntax Errors
+```
+make lint DUT=decoder
+```
+
+Run Simulation
 
 ```
 cd rtl
 make DUT=alu
+```
+
+View Waveform (uses GTKwaves)
+```
+make waves
 ```
 
 # TODO
