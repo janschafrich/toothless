@@ -77,9 +77,9 @@ OP_B_IMM      = int('10', 2)
 RF_IN_ALU             = int('00', 2)
 RF_IN_PC              = int('01', 2)
 
-CTRL_TRSFR_SEL_NONE    = int('00', 2) 
-CTRL_TRSFR_SEL_JUMP    = int('01', 2) 
-CTRL_TRSFR_SEL_BRANCH  = int('10', 2) 
+CTRL_TRANSFER_SEL_NONE    = int('00', 2) 
+CTRL_TRANSFER_SEL_JUMP    = int('01', 2) 
+CTRL_TRANSFER_SEL_BRANCH  = int('10', 2) 
 
 ALU_RESULT_SEL_RF       = int('00', 2)
 ALU_RESULT_SEL_PC       = int('01', 2)        

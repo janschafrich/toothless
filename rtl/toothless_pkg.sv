@@ -56,9 +56,9 @@ package toothless_pkg;
     parameter OP_B_REG      = 2'b00;
     parameter OP_B_IMM      = 2'b10;
 
-    parameter CTRL_TRSFR_SEL_NONE    = 2'b00; 
-    parameter CTRL_TRSFR_SEL_JUMP    = 2'b01; 
-    parameter CTRL_TRSFR_SEL_BRANCH  = 2'b10; 
+    parameter CTRL_TRANSFER_SEL_NONE    = 2'b00; 
+    parameter CTRL_TRANSFER_SEL_JUMP    = 2'b01; 
+    parameter CTRL_TRANSFER_SEL_BRANCH  = 2'b10; 
 
     parameter ALU_RESULT_SEL_RF = 2'b00;
     parameter ALU_RESULT_SEL_PC = 2'b01;
