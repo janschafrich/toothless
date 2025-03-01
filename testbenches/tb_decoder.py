@@ -18,34 +18,65 @@ async def generate_clock(dut):
         await Timer(0.5*CLK_PRD, units='ns')
 
 
-@cocotb.test()
-async def test_decoder(dut):
+async def test_decoding_stores(dut):
 
-    await cocotb.start(generate_clock(dut))     # run in background/parallel
+    print("Testing decoding of stores")
 
-    
-    dut.instr_i.value         = 0
+    offset  = 4
+    rs2     = 2
+    rs1     = 1
 
-    await Timer(3*CLK_PRD, units='ns')
-    print("Test Reset")
-    dut.rst_n.value = 1                              # release reset
+    for width in range(8):
+        instr = rv.SType(offset, rs2, rs1, width)
+        dut.instr_i.value = instr.get_binary()
+        set_current_instr(instr)
+
+        await Timer(CLK_PRD, units='ns')
+
+        if width >= 3:
+            assert_response(dut.instr_invalid_o, True)
+        else:
+            assert_response(dut.instr_invalid_o, False)
+            assert_response(dut.data_type_o, width)
+            
+        # RF
+        assert_response(dut.rs1_used_o, True)  
+        assert_response(dut.rs2_used_o, True)
+        assert_response(dut.rd_used_o, False)
+
+        assert_response(dut.imm_valid_o, True)
+        assert_response(dut.imm_o, np.int32(offset))
+        # ALU
+        assert_response(dut.alu_operator_o, ALU_ADD)
+        assert_response(dut.alu_op_a_mux_sel_o, OP_A_REG)
+        assert_response(dut.alu_op_b_mux_sel_o, OP_B_IMM)
+        # controller
+        assert_response(dut.ctrl_transfer_instr_o,CTRL_TRANSFER_SEL_NONE)
+        assert_response(dut.rf_wp_mux_sel_o, RF_IN_ALU)
+        assert_response(dut.alu_result_mux_sel_o, ALU_RESULT_SEL_LSU)
+        # LSU
+        assert_response(dut.data_req_o, True)
+        assert_response(dut.data_we_o, True)
 
 
 
 
-    # print("Testing decoding of invalid instruction")
+async def test_decoding_invalid_instructions(dut):
+    print("Testing decoding of invalid instruction")
 
-    # dut.instr_i.value = 0
+    dut.instr_i.value = 0
 
-    # await Timer(CLK_PRD, units='ns')
+    await Timer(CLK_PRD, units='ns')
 
-    # assert_response(dut.instr_invalid_o, True)
-    # assert_response(dut.rs1_used_o, False)  
-    # assert_response(dut.rs2_used_o, False)
-    # assert_response(dut.rd_used_o, False)
-    # assert_response(dut.imm_valid_o, False)
-   
+    assert_response(dut.instr_invalid_o, True)
+    assert_response(dut.rs1_used_o, False)  
+    assert_response(dut.rs2_used_o, False)
+    assert_response(dut.rd_used_o, False)
+    assert_response(dut.imm_valid_o, False)
 
+
+
+async def test_decoding_itypes(dut):
     print("Testing decoding of I-Type instructions")
 
     rs1 = np.uint8(1)
@@ -96,13 +127,17 @@ async def test_decoder(dut):
     assert_response(dut.instr_invalid_o, False)
 
 
+
+async def test_decoding_rtypes(dut):
     print("Testing decoding of R-Type instructions")
 
-    rs2 = np.uint8(2)
+    rs1 = np.int8(1)
+    rs2 = np.int8(2)
+    rd  = np.int8(3)
 
     print("Testing decoding of ADD")
     
-    instr = rv.RType(2, 1, F3_ADD_SUB, 3)
+    instr = rv.RType(rs2, rs1, F3_ADD_SUB, rd)
     dut.instr_i.value = instr.get_binary()
     set_current_instr(instr)
 
@@ -120,9 +155,12 @@ async def test_decoder(dut):
     assert_response(dut.alu_op_b_mux_sel_o, OP_B_REG)
     assert_response(dut.instr_invalid_o, False)
 
-    
+
+
+async def test_decoding_lui_auipc(dut):
     print("Testing decoding of U-Type LUI instruction")
 
+    rd          = np.int8(3)
     imm20       = 1
 
     instr = rv.UType(imm20, rd, OPC_LUI)
@@ -162,10 +200,13 @@ async def test_decoder(dut):
     assert_response(dut.alu_op_b_mux_sel_o, OP_B_IMM)
 
 
+async def test_decoding_branches(dut):
     print("Testing decoding of B-Type instruction")
 
     print("Testing aligned branch")
 
+    rs1     = np.int8(1)
+    rs2     = np.int8(2)
     offset = -4096
 
     b_types = [F3_BEQ, F3_BNE, F3_BLT, F3_BGE, F3_BLTU, F3_BGEU]
@@ -212,7 +253,7 @@ async def test_decoder(dut):
     assert_response(dut.ctrl_transfer_instr_o,CTRL_TRANSFER_SEL_BRANCH)
     assert_response(dut.rf_wp_mux_sel_o, RF_IN_ALU)
 
-
+async def test_decoding_jal_jalr(dut):
     print("Testing JAL")
 
     offsets = [0, 2, -2, 2^20, -2^20]   # offset + pc -> target
@@ -267,6 +308,8 @@ async def test_decoder(dut):
         assert_response(dut.rf_wp_mux_sel_o, RF_IN_PC)
 
 
+
+async def test_decoding_loads(dut):
     print("Testing decoding of loads")
 
     offset = 4
@@ -305,40 +348,25 @@ async def test_decoder(dut):
         assert_response(dut.data_req_o, True)
         assert_response(dut.data_we_o, False)
 
-    print("Testing decoding of stores")
 
-    offset  = 4
-    rs2     = 2
-    rs1     = 1
 
-    for width in range(8):
-        instr = rv.SType(offset, rs2, rs1, width)
-        dut.instr_i.value = instr.get_binary()
-        set_current_instr(instr)
+@cocotb.test()
+async def test_decoder(dut):
 
-        await Timer(CLK_PRD, units='ns')
+    await cocotb.start(generate_clock(dut))     # run in background/parallel
 
-        if width >= 3:
-            assert_response(dut.instr_invalid_o, True)
-        else:
-            assert_response(dut.instr_invalid_o, False)
-            assert_response(dut.data_type_o, width)
-            
-        # RF
-        assert_response(dut.rs1_used_o, True)  
-        assert_response(dut.rs2_used_o, True)
-        assert_response(dut.rd_used_o, False)
+    
+    dut.instr_i.value         = 0
 
-        assert_response(dut.imm_valid_o, True)
-        assert_response(dut.imm_o, np.int32(offset))
-        # ALU
-        assert_response(dut.alu_operator_o, ALU_ADD)
-        assert_response(dut.alu_op_a_mux_sel_o, OP_A_REG)
-        assert_response(dut.alu_op_b_mux_sel_o, OP_B_IMM)
-        # controller
-        assert_response(dut.ctrl_transfer_instr_o,CTRL_TRANSFER_SEL_NONE)
-        assert_response(dut.rf_wp_mux_sel_o, RF_IN_ALU)
-        assert_response(dut.alu_result_mux_sel_o, ALU_RESULT_SEL_LSU)
-        # LSU
-        assert_response(dut.data_req_o, True)
-        assert_response(dut.data_we_o, True)
+    await Timer(3*CLK_PRD, units='ns')
+    print("Test Reset")
+    dut.rst_n.value = 1                              # release reset
+
+    await test_decoding_invalid_instructions(dut)
+    await test_decoding_itypes(dut)
+    await test_decoding_rtypes(dut)
+    await test_decoding_lui_auipc(dut)
+    await test_decoding_branches(dut)
+    await test_decoding_jal_jalr(dut)
+    await test_decoding_stores(dut)
+    await test_decoding_loads(dut)
