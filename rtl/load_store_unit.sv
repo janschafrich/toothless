@@ -45,32 +45,36 @@ module load_store_unit #(
     logic [DATA_WIDTH-1:0]  rdata_ext;
 
 
-    // load/store: data type byte enable
+    // single MUX for rdata_ext and data_be
     always_comb begin
-        unique case (data_type_i)
-            2'b00:   data_be = 4'b0001;       // byte
-            2'b01:   data_be = 4'b0011;       // halfword
-            2'b10:   data_be = 4'b1111;       // word
-            default: data_be = 4'b0000;       // not used
-        endcase
-    end
+        // Default values
+        data_be    = 4'b0000;
+        rdata_ext  = 32'd0;
 
-    // loads - sign extension 
-    always_comb begin
         unique case (data_type_i)
-            // bytes
-            2'b00:  begin               
-                if (data_sign_ext_i)    rdata_ext = { {25{rdata[7]} }, rdata[6:0] };
-                else                    rdata_ext = { 24'h00_0000 , rdata[7:0] };
-            end    
-            // halfwords    
-            2'b01: begin                
-                if (data_sign_ext_i)    rdata_ext = { {17{rdata[15]} }, rdata[14:0] };
-                else                    rdata_ext = { 16'h0000 , rdata[15:0] };
+            // Byte
+            2'b00: begin
+                data_be = 4'b0001;
+                if (data_sign_ext_i) 
+                    rdata_ext = { {24{rdata[7]} }, rdata[7:0] }; // Sign-extend byte
+                else 
+                    rdata_ext = { 24'h00_0000, rdata[7:0] };     // Zero-extend byte
             end
-            2'b10:                      rdata_ext = rdata;
-            default:                    rdata_ext = 32'd0;
-        endcase 
+            // Halfword
+            2'b01: begin
+                data_be = 4'b0011;
+                if (data_sign_ext_i) 
+                    rdata_ext = { {16{rdata[15]} }, rdata[15:0] }; // Sign-extend halfword
+                else 
+                    rdata_ext = { 16'h0000, rdata[15:0] };        // Zero-extend halfword
+            end
+            // Word (32-bit)
+            2'b10: begin
+                data_be   = 4'b1111;
+                rdata_ext = rdata;
+            end
+            default: ;
+        endcase
     end
 
     assign rdata_ext_o  = rdata_ext;
