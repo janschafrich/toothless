@@ -14,6 +14,12 @@ def set_current_instr(instr):
 
 
 
+def print_signal(signal):
+    """Prints signame and current value"""
+    print(f"{signal._name}={signal.value}")
+
+
+
 def assert_response(signal, expected_response: int):
     """Assertion function that automatically prints the current instruction if an error occurs."""
     if expected_response < 0:
