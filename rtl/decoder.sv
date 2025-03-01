@@ -309,7 +309,7 @@ always_comb begin: instruction_decoder
         end
 
 
-        OPC_STORE: begin        // endianness
+        OPC_STORE: begin
             
             alu_operator_o          = ALU_ADD;
             alu_op_a_mux_sel_o      = OP_A_REG;
@@ -340,7 +340,7 @@ always_comb begin: instruction_decoder
 
 
         default: begin
-            // instr_invalid_o = 1;
+            instr_invalid_o = 1;
         end
     endcase
 

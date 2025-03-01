@@ -4,7 +4,6 @@ import rv_instructions as rv
 from utils import assert_response, set_current_instr
 from constants_pkg import *
 from cocotb.triggers import Timer
-# from cocotb.binary import BinaryRepresentation, BinaryValue
 
 CLK_PRD = 10
 
@@ -16,6 +15,7 @@ async def generate_clock(dut):
         await Timer(0.5*CLK_PRD, units='ns')  # suspend execution
         dut.clk.value = 1
         await Timer(0.5*CLK_PRD, units='ns')
+
 
 
 async def test_decoding_stores(dut):
@@ -121,7 +121,6 @@ async def test_decoding_itypes(dut):
     assert_response(dut.rd_o, rd)
     assert_response(dut.imm_valid_o, True)
     assert_response(dut.imm_o, np.int32(imm12))
-    # assert_response(dut.imm_o, np.int32(np.binary_repr(imm12, 12)))
     assert_response(dut.alu_op_a_mux_sel_o, OP_A_REG)
     assert_response(dut.alu_op_b_mux_sel_o, OP_B_IMM)
     assert_response(dut.instr_invalid_o, False)
@@ -200,6 +199,7 @@ async def test_decoding_lui_auipc(dut):
     assert_response(dut.alu_op_b_mux_sel_o, OP_B_IMM)
 
 
+
 async def test_decoding_branches(dut):
     print("Testing decoding of B-Type instruction")
 
@@ -252,6 +252,8 @@ async def test_decoding_branches(dut):
     assert_response(dut.alu_op_b_mux_sel_o, OP_B_REG)
     assert_response(dut.ctrl_transfer_instr_o,CTRL_TRANSFER_SEL_BRANCH)
     assert_response(dut.rf_wp_mux_sel_o, RF_IN_ALU)
+
+
 
 async def test_decoding_jal_jalr(dut):
     print("Testing JAL")
@@ -349,6 +351,8 @@ async def test_decoding_loads(dut):
         assert_response(dut.data_we_o, False)
 
 
+
+####################### TESTBENCH #####################################
 
 @cocotb.test()
 async def test_decoder(dut):
