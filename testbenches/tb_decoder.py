@@ -209,7 +209,7 @@ async def test_decoder(dut):
     assert_response(dut.imm_o, np.int32( (offset >> 1) << 1))       # the hardware does not consider the zeroth bit
     assert_response(dut.alu_op_a_mux_sel_o, OP_A_REG)
     assert_response(dut.alu_op_b_mux_sel_o, OP_B_REG)
-    assert_response(dut.ctrl_transfer_instr_o,CTRL_TRSFR_SEL_BRANCH)
+    assert_response(dut.ctrl_transfer_instr_o,CTRL_TRANSFER_SEL_BRANCH)
     assert_response(dut.rf_wp_mux_sel_o, RF_IN_ALU)
 
 
@@ -235,7 +235,7 @@ async def test_decoder(dut):
         assert_response(dut.imm_o, np.int32( (offset >> 1) << 1))       # the hardware does not consider the zeroth bit
         assert_response(dut.alu_op_a_mux_sel_o, OP_A_CURPC)
         assert_response(dut.alu_op_b_mux_sel_o, OP_B_IMM)
-        assert_response(dut.ctrl_transfer_instr_o,CTRL_TRSFR_SEL_JUMP)
+        assert_response(dut.ctrl_transfer_instr_o,CTRL_TRANSFER_SEL_JUMP)
         assert_response(dut.rf_wp_mux_sel_o, RF_IN_PC)
 
 
@@ -263,25 +263,24 @@ async def test_decoder(dut):
         assert_response(dut.imm_o, np.int32( (offset >> 1) << 1))       # the hardware does not consider the zeroth bit
         assert_response(dut.alu_op_a_mux_sel_o, OP_A_REG)
         assert_response(dut.alu_op_b_mux_sel_o, OP_B_IMM)
-        assert_response(dut.ctrl_transfer_instr_o,CTRL_TRSFR_SEL_JUMP)
+        assert_response(dut.ctrl_transfer_instr_o,CTRL_TRANSFER_SEL_JUMP)
         assert_response(dut.rf_wp_mux_sel_o, RF_IN_PC)
 
 
-    print("Testing decoding of loads ")
+    print("Testing decoding of loads")
 
     offset = 4
     rs1     = 1
     rd      = 2
-    widths  = [0, 1, 2, 3] 
 
-    for width in widths:
+    for width in range(4):
         instr = rv.LoadInstr(offset, rs1, width, rd)
         dut.instr_i.value = instr.get_binary()
         set_current_instr(instr)
 
         await Timer(CLK_PRD, units='ns')
 
-        if width == 3:
+        if width >= 3:
             assert_response(dut.instr_invalid_o, True)
         else:
             assert_response(dut.instr_invalid_o, False)
@@ -299,14 +298,14 @@ async def test_decoder(dut):
         assert_response(dut.alu_op_a_mux_sel_o, OP_A_REG)
         assert_response(dut.alu_op_b_mux_sel_o, OP_B_IMM)
         # controller
-        assert_response(dut.ctrl_transfer_instr_o,CTRL_TRSFR_SEL_NONE)
+        assert_response(dut.ctrl_transfer_instr_o,CTRL_TRANSFER_SEL_NONE)
         assert_response(dut.rf_wp_mux_sel_o, RF_IN_ALU)
         assert_response(dut.alu_result_mux_sel_o, ALU_RESULT_SEL_LSU)
         # LSU
         assert_response(dut.data_req_o, True)
         assert_response(dut.data_we_o, False)
 
-    print("Testing decoding of stores ")
+    print("Testing decoding of stores")
 
     offset  = 4
     rs2     = 2
@@ -337,7 +336,7 @@ async def test_decoder(dut):
         assert_response(dut.alu_op_a_mux_sel_o, OP_A_REG)
         assert_response(dut.alu_op_b_mux_sel_o, OP_B_IMM)
         # controller
-        assert_response(dut.ctrl_transfer_instr_o,CTRL_TRSFR_SEL_NONE)
+        assert_response(dut.ctrl_transfer_instr_o,CTRL_TRANSFER_SEL_NONE)
         assert_response(dut.rf_wp_mux_sel_o, RF_IN_ALU)
         assert_response(dut.alu_result_mux_sel_o, ALU_RESULT_SEL_LSU)
         # LSU

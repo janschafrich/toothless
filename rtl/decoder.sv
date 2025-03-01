@@ -59,7 +59,7 @@ always_comb begin: instruction_decoder
 
     rf_wp_mux_sel_o         = 2'b00;        // ALU
     alu_result_mux_sel_o    = ALU_RESULT_SEL_RF;        // RF
-    ctrl_transfer_instr_o   = CTRL_TRSFR_SEL_NONE;        // none
+    ctrl_transfer_instr_o   = CTRL_TRANSFER_SEL_NONE;        // none
 
     data_req_o  = 1'b0;
     data_type_o = 2'b10;                    // word
@@ -231,7 +231,7 @@ always_comb begin: instruction_decoder
             alu_op_a_mux_sel_o  = OP_A_REG;
             alu_op_b_mux_sel_o  = OP_B_REG;
 
-            ctrl_transfer_instr_o = CTRL_TRSFR_SEL_BRANCH;
+            ctrl_transfer_instr_o = CTRL_TRANSFER_SEL_BRANCH;
 
             // offset, to program counter ?
             imm_valid_o = 1'b1;
@@ -257,7 +257,7 @@ always_comb begin: instruction_decoder
 
             alu_op_b_mux_sel_o      = OP_B_IMM;
 
-            ctrl_transfer_instr_o   = CTRL_TRSFR_SEL_JUMP;
+            ctrl_transfer_instr_o   = CTRL_TRANSFER_SEL_JUMP;
             rf_wp_mux_sel_o         = 2'b01;                // MUX select pc_plus4
             alu_operator_o          = ALU_ADD;              // jump target
             alu_result_mux_sel_o    = ALU_RESULT_SEL_PC;             // program counter
@@ -330,8 +330,8 @@ always_comb begin: instruction_decoder
             unique case (instr_i[14:12])
                 3'b000:     data_type_o = 2'b00;
                 3'b001:     data_type_o = 2'b01;
-                // 3'b010:     data_type_o = 2'b10;
-                default:    ; //instr_invalid_o = 1'b1;
+                3'b010:     data_type_o = 2'b10;
+                default:    instr_invalid_o = 1'b1;
             endcase
         end
 

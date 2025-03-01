@@ -252,7 +252,7 @@ class SType(RVInstr):
                     + format(self.rs1, '05b') \
                     + format(self.funct3, '03b') \
                     + format(self.imm4_0, '05b') \
-                    + format(self.opcode, '05b')
+                    + format(self.opcode, '07b')
 
         return int(instr_str, 2)
     
