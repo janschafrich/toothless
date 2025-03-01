@@ -37,6 +37,7 @@ module decoder #(
     output logic        data_req_o,                   // request data memory access
     output logic [1:0]  data_type_o,                // word, half word, byte for LSU
     output logic        data_we_o,                    // write or read to memory
+    output logic        data_sign_ext_o,            // whether or not data from memory is to be sign extended
 
     output logic instr_invalid_o                    // everything not part of RV32I is invalid
 );

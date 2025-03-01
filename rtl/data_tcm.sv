@@ -24,9 +24,6 @@ module data_tcm #(
 
 
     logic [LAU-1:0] mem [SIZE_LAU];
-    // logic [-1:0] int_addr;
-
-    // always int_addr[$clog2(SIZE_LAU)-1 : 0] = addr_i[$clog2(SIZE_LAU) -1 : 0];    //
 
     always @ (posedge clk)
     begin
