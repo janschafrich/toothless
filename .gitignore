@@ -15,3 +15,6 @@ testbenches/__pycache__
 
 
 utils
+
+synthesis/stat.log
+synthesis/*.v

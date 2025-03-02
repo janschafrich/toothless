@@ -24,6 +24,7 @@ Setup Verilator Path
 ```
 export VERILATOR_ROOT=/home/jscha/projects/verilator
 export PATH=$VERILATOR_ROOT/bin:$PATH
+export PATH="/home/jscha/projects/oss-cad-suite/bin:$PATH"
 ```
 
 Check for Syntax Errors
@@ -43,10 +44,23 @@ View Waveform (uses GTKwaves)
 make waves
 ```
 
-# TODO
+# Synthesis Yosys
 
-- where to define which register to access
-- python central single definiton of constants
+- uses synthesis script `synthesis/syn.sh`
+- Need to manually specify source files inside script
+
+Get yosys statistics
+```
+cd rtl
+make stats
+```
+
+perform full synthesis with default library
+```
+cd synthesis
+./syn.sh
+```
+
 
 
 

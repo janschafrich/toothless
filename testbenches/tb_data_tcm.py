@@ -4,8 +4,6 @@ from cocotb.triggers import Timer
 
 CLK_PRD = 10
 
-# def print_signal(signal):
-#     print(f"{signal._name}={signal.value}")
 
 async def generate_clock(dut):
     """ Generate clock signal """
