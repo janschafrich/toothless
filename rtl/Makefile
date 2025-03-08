@@ -1,7 +1,6 @@
 # Makefile
 
 export PYTHONPATH 		:= $(PWD)/../testbenches:$(PYTHONPATH)
-OSS_CAD_SUITE   		:= /home/jscha/projects/oss-cad-suite/bin
 # export VERILATOR_ROOT 	:= /home/jscha/projects/verilator
 # export $(PATH)				:= $(VERILATOR_ROOT)/bin:$(PATH)
 
@@ -30,7 +29,7 @@ TOPLEVEL        = $(DUT)
 MODULE          = tb_$(DUT)
 
 # include cocotb's make rules to take care of the simulator setup
-#include $(shell cocotb-config --makefiles)/Makefile.sim
+include $(shell cocotb-config --makefiles)/Makefile.sim
 
 
 .PHONY:lint
@@ -46,25 +45,11 @@ waves: dump.vcd
 .PHONY:stats
 stats:
 	../synthesis/syn.sh stats
-
-.PHONY:syn
-syn:
-	../synthesis/syn.sh syn
-	
-	
-#export PATH=/home/jscha/projects/oss-cad-suite/bin:$$PATH \
-#	yosys -p "read -sv $(VERILOG_SOURCES); hierarchy -top $(DUT); proc; opt; techmap; opt; write_verilog synth.v; synth; stat"
-	
-	
-	 
 	
 
-
-# .PHONY: clean
-# clean:
-# 	rm -rf ./sim_build
-# 	rm -rf dump.vcd
-# 	rm -rf results.xml
-
-
-
+# :: instead of : necessary due to error
+.PHONY:clean
+clean::
+	rm -rf ./sim_build
+	rm -rf dump.vcd
+	rm -rf results.xml
