@@ -76,6 +76,7 @@ async def test_load_store_unit(dut):
         dut.wdata_i.value        = value
         print_signal(dut.addr_i)
         print_signal(dut.wdata_i)
+        print()
         dut.we_i.value          = 1
         dut.data_type_i.value   = data_type
         await Timer(CLK_PRD, units='ns')
