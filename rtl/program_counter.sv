@@ -29,9 +29,9 @@ module program_counter(
 
 			case (ctrl_transfer_instr_i)
 				
-				CTRL_TRANSFER_SEL_JUMP: pc_o <= tgt_addr_i;
+				CTRL_TRANS_SEL_JUMP: pc_o <= tgt_addr_i;
 
-				CTRL_TRANSFER_SEL_BRANCH: if (branch_tkn_i) pc_o <= pc_o + offset_i;
+				CTRL_TRANS_SEL_BRANCH: if (branch_tkn_i) pc_o <= pc_o + offset_i;
 
 				default: ;
 			endcase

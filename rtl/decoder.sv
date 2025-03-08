@@ -31,7 +31,7 @@ module decoder #(
 
 
     // program counter signals
-    output logic [1:0]  ctrl_transfer_instr_o,      // current instr is control transfer, 00 none, 01 jump, 10 branch
+    output logic [1:0]  ctrl_trans_instr_o,      // current instr is control transfer, 00 none, 01 jump, 10 branch
 
     // load store unit signals
     output logic        data_req_o,                   // request data memory access
@@ -60,7 +60,7 @@ always_comb begin: instruction_decoder
 
     rf_wp_mux_sel_o         = 2'b00;        // ALU
     alu_result_mux_sel_o    = ALU_RESULT_SEL_RF;        // RF
-    ctrl_transfer_instr_o   = CTRL_TRANSFER_SEL_NONE;        // none
+    ctrl_trans_instr_o   = CTRL_TRANS_SEL_NONE;        // none
 
     data_req_o  = 1'b0;
     data_type_o = 2'b10;                    // word
@@ -232,7 +232,7 @@ always_comb begin: instruction_decoder
             alu_op_a_mux_sel_o  = OP_A_REG;
             alu_op_b_mux_sel_o  = OP_B_REG;
 
-            ctrl_transfer_instr_o = CTRL_TRANSFER_SEL_BRANCH;
+            ctrl_trans_instr_o = CTRL_TRANS_SEL_BRANCH;
 
             // offset, to program counter ?
             imm_valid_o = 1'b1;
@@ -258,10 +258,10 @@ always_comb begin: instruction_decoder
 
             alu_op_b_mux_sel_o      = OP_B_IMM;
 
-            ctrl_transfer_instr_o   = CTRL_TRANSFER_SEL_JUMP;
-            rf_wp_mux_sel_o         = 2'b01;                // MUX select pc_plus4
-            alu_operator_o          = ALU_ADD;              // jump target
-            alu_result_mux_sel_o    = ALU_RESULT_SEL_PC;             // program counter
+            ctrl_trans_instr_o      = CTRL_TRANS_SEL_JUMP;
+            rf_wp_mux_sel_o         = 2'b01;                    // MUX select pc_plus4
+            alu_operator_o          = ALU_ADD;                  // jump target
+            alu_result_mux_sel_o    = ALU_RESULT_SEL_PC;        // program counter
             rd_used_o               = 1'b1;
             imm_valid_o             = 1'b1;
 

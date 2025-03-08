@@ -51,7 +51,7 @@ async def test_decoding_stores(dut):
         assert_response(dut.alu_op_a_mux_sel_o, OP_A_REG)
         assert_response(dut.alu_op_b_mux_sel_o, OP_B_IMM)
         # controller
-        assert_response(dut.ctrl_transfer_instr_o,CTRL_TRANSFER_SEL_NONE)
+        assert_response(dut.ctrl_transfer_instr_o,CTRL_TRANS_SEL_NONE)
         assert_response(dut.rf_wp_mux_sel_o, RF_IN_ALU)
         assert_response(dut.alu_result_mux_sel_o, ALU_RESULT_SEL_LSU)
         # LSU
@@ -250,7 +250,7 @@ async def test_decoding_branches(dut):
     assert_response(dut.imm_o, np.int32( (offset >> 1) << 1))       # the hardware does not consider the zeroth bit
     assert_response(dut.alu_op_a_mux_sel_o, OP_A_REG)
     assert_response(dut.alu_op_b_mux_sel_o, OP_B_REG)
-    assert_response(dut.ctrl_transfer_instr_o,CTRL_TRANSFER_SEL_BRANCH)
+    assert_response(dut.ctrl_transfer_instr_o,CTRL_TRANS_SEL_BRANCH)
     assert_response(dut.rf_wp_mux_sel_o, RF_IN_ALU)
 
 
@@ -278,7 +278,7 @@ async def test_decoding_jal_jalr(dut):
         assert_response(dut.imm_o, np.int32( (offset >> 1) << 1))       # the hardware does not consider the zeroth bit
         assert_response(dut.alu_op_a_mux_sel_o, OP_A_CURPC)
         assert_response(dut.alu_op_b_mux_sel_o, OP_B_IMM)
-        assert_response(dut.ctrl_transfer_instr_o,CTRL_TRANSFER_SEL_JUMP)
+        assert_response(dut.ctrl_transfer_instr_o,CTRL_TRANS_SEL_JUMP)
         assert_response(dut.rf_wp_mux_sel_o, RF_IN_PC)
 
 
@@ -306,7 +306,7 @@ async def test_decoding_jal_jalr(dut):
         assert_response(dut.imm_o, np.int32( (offset >> 1) << 1))       # the hardware does not consider the zeroth bit
         assert_response(dut.alu_op_a_mux_sel_o, OP_A_REG)
         assert_response(dut.alu_op_b_mux_sel_o, OP_B_IMM)
-        assert_response(dut.ctrl_transfer_instr_o,CTRL_TRANSFER_SEL_JUMP)
+        assert_response(dut.ctrl_transfer_instr_o,CTRL_TRANS_SEL_JUMP)
         assert_response(dut.rf_wp_mux_sel_o, RF_IN_PC)
 
 
@@ -343,7 +343,7 @@ async def test_decoding_loads(dut):
         assert_response(dut.alu_op_a_mux_sel_o, OP_A_REG)
         assert_response(dut.alu_op_b_mux_sel_o, OP_B_IMM)
         # controller
-        assert_response(dut.ctrl_transfer_instr_o,CTRL_TRANSFER_SEL_NONE)
+        assert_response(dut.ctrl_transfer_instr_o,CTRL_TRANS_SEL_NONE)
         assert_response(dut.rf_wp_mux_sel_o, RF_IN_ALU)
         assert_response(dut.alu_result_mux_sel_o, ALU_RESULT_SEL_LSU)
         # LSU
