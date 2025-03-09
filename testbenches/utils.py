@@ -2,12 +2,13 @@ import cocotb
 import typing
 import numpy as np
 from constants_pkg import *
+import rv_instructions as rv
 
 
 _current_instr = None
 
 
-def set_current_instr(instr):
+def set_current_instr(instr : rv.RVInstr):
     """Sets the current instruction globally."""
     global _current_instr
     _current_instr = instr
@@ -16,7 +17,7 @@ def set_current_instr(instr):
 
 def print_signal(signal):
     """Prints signame and current value"""
-    print(f"{signal._name}={signal.value}")
+    print(f"             {signal._name}={signal.value}")
 
 
 

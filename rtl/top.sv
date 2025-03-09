@@ -33,23 +33,23 @@ module top #(
     logic [DATA_WIDTH-1:0] wdata_a;
     logic                  we_a;
 
-    program_counter #() program_counter_i (
-	    .clk            (clk_i),
-	    .rst_n          (rst_ni),
-        .ctrl_transfer_instr_i(ctrl_transfer_instr),
-        .offset_i       (offset),
-	    .branch_tkn_i   (branch_tkn), 
-	    .tgt_addr_i     (tgt_addr),
-	    .pc_o           (pc),
-        .pc_plus4_o     (pc_plus4)
-    );
+    // program_counter #() program_counter_i (
+	//     .clk            (clk_i),
+	//     .rst_n          (rst_ni),
+    //     .ctrl_transfer_instr_i(ctrl_transfer_instr),
+    //     .offset_i       (offset),
+	//     .branch_tkn_i   (branch_tkn), 
+	//     .tgt_addr_i     (tgt_addr),
+	//     .pc_o           (pc),
+    //     .pc_plus4_o     (pc_plus4)
+    // );
 
-    instruction_rom #() instruction_rom_i (
-        .clk_i(clk_i),
-        .rst_ni(rst_ni),
-        .addr_i(pc),
-        .instr_o(instr)
-    );
+    // instruction_rom #() instruction_rom_i (
+    //     .clk_i(clk_i),
+    //     .rst_ni(rst_ni),
+    //     .addr_i(pc),
+    //     .instr_o(instr)
+    // );
 
     register_file #(
         .DATA_WIDTH (DATA_WIDTH)

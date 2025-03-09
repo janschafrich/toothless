@@ -10,9 +10,6 @@ module decoder #(
 
     // ALU signals
     output alu_opcode_e alu_operator_o,              // select operation to be performed by ALU
-    output logic [1:0]  alu_op_a_mux_sel_o,          // operand a selection: reg, PC, immediate or zero
-    output logic [1:0]  alu_op_b_mux_sel_o,           // operand b selection: reg or immediate
-
 
     output logic [DATA_WIDTH-1:0]   imm_o,           // sign/zero extended immediate value from current instruction
     output logic                    imm_valid_o,       // whether current instruction has an immediate value
@@ -28,6 +25,8 @@ module decoder #(
     // controller signals
     output logic [1:0]  rf_wp_mux_sel_o,           // write source: 00 ALU, 01 PC
     output logic [1:0]  alu_result_mux_sel_o,      // where should the ALU result go: 00 RF, 01 PC, 10 LSU
+    output logic [1:0]  alu_op_a_mux_sel_o,          // operand a selection: reg, PC, immediate or zero
+    output logic [1:0]  alu_op_b_mux_sel_o,           // operand b selection: reg or immediate
 
 
     // program counter signals

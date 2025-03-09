@@ -8,9 +8,9 @@ async def generate_clock(dut):
     """ Generate clock signal """
     
     for cycle in range(100):
-        dut.clk_i.value = 0
+        dut.clk.value = 0
         await Timer(0.5*CLK_PRD, units='ns')  # suspend execution
-        dut.clk_i.value = 1
+        dut.clk.value = 1
         await Timer(0.5*CLK_PRD, units='ns')
 
 
@@ -20,14 +20,14 @@ async def test_program_counter(dut):
     await cocotb.start(generate_clock(dut))     # run in background/parallel
 
     
-    dut.rst_ni.value        = 0
+    dut.rst_n.value        = 0
     dut.branch_tkn_i.value  = 0
     dut.is_jalr_i.value     = 0
     dut.tgt_addr_i.value    = 0
 
     await Timer(3*CLK_PRD, units='ns')
     print("Test Reset")
-    dut.rst_ni.value = 1                              # release reset
+    dut.rst_n.value = 1                              # release reset
     assert dut.pc_o.value == 0x0, f"Expected pc_o=0x0, but got {hex(dut.pc_o.value)}"
 
     print("Test Sequential Code execution")

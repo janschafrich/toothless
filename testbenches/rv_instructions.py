@@ -8,19 +8,20 @@ Generate RISCV instructions for verification purposes.
 """
 
 class RVInstr:
-    def __init__(self, opcode=None):
+    def __init__(self, mnemonic=None, opcode=None):
         self.opcode     = np.uint8(opcode)
         self.length     = np.uint8(32)
+        self.mnemonic   = mnemonic
 
 class IType(RVInstr):
     """ RISCV I opcode Instruction: 12imm + rs1 + func3 + rd + opcode """
         
-    def __init__(self, imm12 : int, rs1 : int, funct3 : int, rd : int, opcode : int = I_TYPE):
+    def __init__(self, mnemonic : str, imm12 : int, rs1 : int, funct3 : int, rd : int, opcode : int = I_TYPE):
         self.imm12  = imm12
         self.rs1    = np.uint8(rs1)
         self.funct3 = np.uint8(funct3)
         self.rd     = np.uint8(rd)
-        super().__init__(opcode=opcode)
+        super().__init__(mnemonic=mnemonic, opcode=opcode)
 
 
     def get_binary(self) -> np.int32:
@@ -47,8 +48,16 @@ class IType(RVInstr):
         """
 
         return table
+    
 
+    def get_human_readable_machine_code(self):
+        """ Get an binary string where fields are sepearated by a space"""
+        return f"0b {np.binary_repr(self.imm12, 12):>12}_{self.rs1:05b}_{self.funct3:03b}_{self.rd:05b}_{self.opcode:07b}"
+    
 
+    def get_asm(self):
+        """ Get an assembly like formatted string"""
+        return  f"{self.mnemonic} x{self.rd}, x{self.rs1}, {self.imm12}"
 
 class RType(RVInstr):
     """ RISCV R-opcode Instruction: funct7 + rs2 + rs1 + funct3 + rd + opcode """
@@ -269,5 +278,58 @@ class SType(RVInstr):
         """
 
         return table
+    
+
+###########################################################################
+#### Instruction Listing
+##########################################################################
 
 
+#### I Types
+
+class AddiInstr(IType):
+    """ RISCV ADDI opcode Instruction: imm + rs1 + funct3 + rd + opcode """
+
+    def __init__(self, rd : int, rs1 : int, imm12 : int):
+        super().__init__(mnemonic='ADDI', imm12=imm12, rs1=rs1, funct3=F3_ADD_SUB, rd=rd, opcode=I_TYPE)
+
+class AndiInstr(IType):
+    """ RISCV ADDI opcode Instruction: imm + rs1 + funct3 + rd + opcode """
+
+    def __init__(self, rd : int, rs1 : int, imm12 : int):
+        super().__init__(mnemonic='ANDI', imm12=imm12, rs1=rs1, funct3=F3_AND, rd=rd, opcode=I_TYPE)
+
+class XoriInstr(IType):
+    """ RISCV instruction field definition """
+
+    def __init__(self, rd : int, rs1 : int, imm12 : int):
+        super().__init__(mnemonic='XORI', imm12=imm12, rs1=rs1, funct3=F3_XOR, rd=rd, opcode=I_TYPE)
+
+class OriInstr(IType):
+    """ RISCV instruction field definition """
+
+    def __init__(self, rd : int, rs1 : int, imm12 : int):
+        super().__init__(mnemonic='ORI', imm12=imm12, rs1=rs1, funct3=F3_OR, rd=rd, opcode=I_TYPE)
+
+
+class SlliInstr(IType):
+    """ RISCV instruction field definition """
+
+    def __init__(self, rd : int, rs1 : int, imm12 : int):
+        super().__init__(mnemonic='SLLI', imm12=imm12, rs1=rs1, funct3=F3_SLL, rd=rd, opcode=I_TYPE)
+
+
+class SrliInstr(IType):
+    """ RISCV instruction field definition """
+
+    def __init__(self, rd : int, rs1 : int, imm12 : int):
+        super().__init__(mnemonic='SRLI', imm12=imm12, rs1=rs1, funct3=F3_SRL_SRA, rd=rd, opcode=I_TYPE)
+
+
+#### R Types
+
+class AddInstr(RType):
+    """ RISCV instruction field definition """
+
+    def __init__(self, rd : int, rs1 : int, rs2 : int):
+        super().__init__(mnemonic='ADD', rs2=rs2, rs1=rs1, funct3=F3_ADD_SUB, rd=rd, opcode=R_TYPE)

@@ -8,8 +8,8 @@ rtl/results.xml
 rtl/dump.vcd
 
 rtl/decoder_old.sv
-rtl/alu.sv
 rtl/alu_old.sv
+rtl/top.sv
 
 testbenches/__pycache__
 

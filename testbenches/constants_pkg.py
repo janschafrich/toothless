@@ -19,6 +19,12 @@ OPC_JALR    = int('110_0111', 2)
 # funct3 field
 F3_ADD_SUB  = int('000', 2)
 F3_SLL      = int('001', 2)
+F3_SLT      = int('010', 2)
+F3_SLTU     = int('011', 2)
+F3_XOR      = int('100', 2)  
+F3_OR       = int('110', 2)   
+F3_AND      = int('111', 2)
+F3_SRL_SRA  = int('101', 2)
 
 F3_BEQ      = int('000', 2) 
 F3_BNE      = int('001', 2)
