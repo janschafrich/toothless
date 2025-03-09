@@ -169,12 +169,12 @@ always_comb begin: instruction_decoder
 
                 3'b001: begin        // slli
                     alu_operator_o = ALU_SLL;
-                    imm_o    = { {27{1'b0}}, instr_i[4:0]};    // zero extented shift amount
+                    imm_o    = { {27{1'b0}}, instr_i[24:20]};    // zero extented shift amount
                 end
 
                 3'b101: begin       // srai   
                     
-                    imm_o    = { {27{1'b0}}, instr_i[4:0]};    // zero extented shift amount
+                    imm_o    = { {27{1'b0}}, instr_i[24:20]};    // zero extented shift amount
                     
                     if (instr_i[30]) 
                     begin
