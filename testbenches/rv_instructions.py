@@ -13,10 +13,36 @@ class RVInstr:
         self.length     = np.uint8(32)
         self.mnemonic   = mnemonic
 
+
+    def get_asm(self):
+        """ Generic assembly format method. """
+        rd   = getattr(self, 'rd', None)
+        rs1  = getattr(self, 'rs1', None)
+        rs2  = getattr(self, 'rs2', None)
+        imm  = getattr(self, 'imm12', None)
+
+        if self.mnemonic is None:
+            return "UNKNOWN_INSTR"
+
+        asm_parts = [self.mnemonic]
+
+        if rd is not None:
+            asm_parts.append(f"x{rd}")
+        if rs1 is not None:
+            asm_parts.append(f"x{rs1}")
+        if rs2 is not None:
+            asm_parts.append(f"x{rs2}")
+        if imm is not None:
+            asm_parts.append(str(imm))
+
+        return " ".join(asm_parts)
+    
+
+
 class IType(RVInstr):
     """ RISCV I opcode Instruction: 12imm + rs1 + func3 + rd + opcode """
         
-    def __init__(self, mnemonic : str, imm12 : int, rs1 : int, funct3 : int, rd : int, opcode : int = I_TYPE):
+    def __init__(self, imm12 : int, rs1 : int, funct3 : int, rd : int, opcode : int = I_TYPE, mnemonic : str = None):
         self.imm12  = imm12
         self.rs1    = np.uint8(rs1)
         self.funct3 = np.uint8(funct3)
@@ -24,16 +50,24 @@ class IType(RVInstr):
         super().__init__(mnemonic=mnemonic, opcode=opcode)
 
 
-    def get_binary(self) -> np.int32:
-        """ Generate machine code instrucion """
+    def get_binary_string(self, with_spaces=False):
+        """Return a binary representation of the instruction. 
+        
+        If `with_spaces` is True, the binary fields are separated by '_'.
+        If False, returns an integer representation.
+        """
 
-        instr_str = np.binary_repr(self.imm12, 12) \
-                    + format(self.rs1, '05b') \
-                    + format(self.funct3, '03b') \
-                    + format(self.rd, '05b') \
-                    + format(self.opcode, '07b')
-
-        return int(instr_str, 2)
+        fields = [
+            format(self.imm12 & 0xFFF, '012b'),  # Ensure 12-bit representation for potential negatives
+            format(self.rs1, '05b'),
+            format(self.funct3, '03b'),
+            format(self.rd, '05b'),
+            format(self.opcode, '07b')
+        ]
+        
+        binary_str = "_".join(fields) if with_spaces else "".join(fields)
+        
+        return binary_str if with_spaces else int(binary_str, 2)
     
 
     def get_formatted_fields(self):
@@ -50,26 +84,28 @@ class IType(RVInstr):
         return table
     
 
-    def get_human_readable_machine_code(self):
-        """ Get an binary string where fields are sepearated by a space"""
-        return f"0b {np.binary_repr(self.imm12, 12):>12}_{self.rs1:05b}_{self.funct3:03b}_{self.rd:05b}_{self.opcode:07b}"
-    
 
-    def get_asm(self):
-        """ Get an assembly like formatted string"""
-        return  f"{self.mnemonic} x{self.rd}, x{self.rs1}, {self.imm12}"
+
+class JalrInstr(IType):
+    """ RISCV JALR opcode Instruction: imm + rs1 + funct3 + rd + opcode """
+
+    def __init__(self, offset : int, base_r : int, dest_r : int):
+        super().__init__(imm12=offset, rs1=base_r, funct3=0, rd=dest_r, opcode=OPC_JALR, mnemonic="JALR")
+
+
 
 class RType(RVInstr):
     """ RISCV R-opcode Instruction: funct7 + rs2 + rs1 + funct3 + rd + opcode """
         
-    def __init__(self, rs2 : int, rs1 : int, funct3 : int, rd : int):
+    def __init__(self, rs2 : int, rs1 : int, funct3 : int, rd : int, mnemonic : str = None):
         
         self.funct7 = np.uint8(1 << 5 if funct3 in [ALU_SUB, ALU_SRA] else 0)
         self.rs2    = np.uint8(rs2)
         self.rs1    = np.uint8(rs1)
         self.funct3 = np.uint8(funct3)
         self.rd     = np.uint8(rd)
-        super().__init__(opcode=R_TYPE)
+        super().__init__(opcode=R_TYPE, mnemonic=mnemonic)
+
 
 
     def get_binary(self) -> np.int32:
@@ -98,6 +134,15 @@ class RType(RVInstr):
 
         return table
     
+
+    def get_binary_string(self, with_spaces=False):
+        """ Get an binary string where fields are sepearated by a space"""
+
+        sep = ''
+        if with_spaces == True:
+            sep = '_'
+        return f"{self.funct7:07b}{sep}{self.rs2:05b}{sep}{self.rs1:05b}{sep}{self.funct3:03b}{sep}{self.rd:05b}{sep}{self.opcode:07b}"
+        
 
 class UType(RVInstr):
     """ RISCV U opcode Instruction: imm20 + rd + opcode """
@@ -193,7 +238,7 @@ class JalInstr(RVInstr):
         self.imm11      = (offset >> 11) & 0b1          # getting bit 11
         self.imm19_12   = (offset >> 12) & 0b1111_1111  # getting bits 19:12
         self.rd         = dest
-        super().__init__(opcode=OPC_JAL)
+        super().__init__("JAL", opcode=OPC_JAL)
 
 
     def get_binary(self) -> np.int32:
@@ -226,7 +271,7 @@ class JalrInstr(IType):
     """ RISCV JALR opcode Instruction: imm + rs1 + funct3 + rd + opcode """
 
     def __init__(self, offset : int, base_r : int, dest_r : int):
-        super().__init__(imm12=offset, rs1=base_r, funct3=0, rd=dest_r, opcode=OPC_JALR)
+        super().__init__(imm12=offset, rs1=base_r, funct3=0, rd=dest_r, opcode=OPC_JALR, mnemonic="JALR")
 
 
 
@@ -293,17 +338,33 @@ class AddiInstr(IType):
     def __init__(self, rd : int, rs1 : int, imm12 : int):
         super().__init__(mnemonic='ADDI', imm12=imm12, rs1=rs1, funct3=F3_ADD_SUB, rd=rd, opcode=I_TYPE)
 
+
+class SltiInstr(IType):
+    """ RISCV instruction definition """
+
+    def __init__(self, rd : int, rs1 : int, imm12 : int):
+        super().__init__(imm12=imm12, rs1=rs1, funct3=F3_SLT, rd=rd, opcode=I_TYPE,mnemonic='SLTI')
+
+
+class SltiuInstr(IType):
+    """ RISCV instruction definition """
+
+    def __init__(self, rd : int, rs1 : int, imm12 : int):
+        super().__init__(imm12=imm12, rs1=rs1, funct3=F3_SLTU, rd=rd, opcode=I_TYPE,mnemonic='SLTIU')
+
 class AndiInstr(IType):
     """ RISCV ADDI opcode Instruction: imm + rs1 + funct3 + rd + opcode """
 
     def __init__(self, rd : int, rs1 : int, imm12 : int):
         super().__init__(mnemonic='ANDI', imm12=imm12, rs1=rs1, funct3=F3_AND, rd=rd, opcode=I_TYPE)
 
+
 class XoriInstr(IType):
     """ RISCV instruction field definition """
 
     def __init__(self, rd : int, rs1 : int, imm12 : int):
         super().__init__(mnemonic='XORI', imm12=imm12, rs1=rs1, funct3=F3_XOR, rd=rd, opcode=I_TYPE)
+
 
 class OriInstr(IType):
     """ RISCV instruction field definition """
@@ -315,15 +376,15 @@ class OriInstr(IType):
 class SlliInstr(IType):
     """ RISCV instruction field definition """
 
-    def __init__(self, rd : int, rs1 : int, imm12 : int):
-        super().__init__(mnemonic='SLLI', imm12=imm12, rs1=rs1, funct3=F3_SLL, rd=rd, opcode=I_TYPE)
+    def __init__(self, rd : int, rs1 : int, shamt : int):
+        super().__init__(mnemonic='SLLI', imm12=shamt, rs1=rs1, funct3=F3_SLL, rd=rd, opcode=I_TYPE)
 
 
 class SrliInstr(IType):
     """ RISCV instruction field definition """
 
-    def __init__(self, rd : int, rs1 : int, imm12 : int):
-        super().__init__(mnemonic='SRLI', imm12=imm12, rs1=rs1, funct3=F3_SRL_SRA, rd=rd, opcode=I_TYPE)
+    def __init__(self, rd : int, rs1 : int, shamt : int):
+        super().__init__(mnemonic='SRLI', imm12=shamt, rs1=rs1, funct3=F3_SRL_SRA, rd=rd, opcode=I_TYPE)
 
 
 #### R Types
@@ -332,4 +393,4 @@ class AddInstr(RType):
     """ RISCV instruction field definition """
 
     def __init__(self, rd : int, rs1 : int, rs2 : int):
-        super().__init__(mnemonic='ADD', rs2=rs2, rs1=rs1, funct3=F3_ADD_SUB, rd=rd, opcode=R_TYPE)
+        super().__init__(rs2=rs2, rs1=rs1, funct3=F3_ADD_SUB, rd=rd, mnemonic='ADD')
