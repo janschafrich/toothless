@@ -319,10 +319,8 @@ always_comb begin: instruction_decoder
             rs1_used_o          = 1'b1;
             rs2_used_o          = 1'b1;
 
-            imm_valid_o     = 1'b1;
-            imm_o[31:11]    = {21{instr_i[31]}};    // sign extend
-            imm_o[10:5]     = instr_i[30:25];
-            imm_o[4:0]      = instr_i[11:7];
+            imm_valid_o = 1'b1;
+            imm_o       = { {21{instr_i[31]}}, instr_i[30:25], instr_i[11:7] } ;    // sign extend
 
             data_req_o      = 1'b1;
             data_we_o       = 1'b1;

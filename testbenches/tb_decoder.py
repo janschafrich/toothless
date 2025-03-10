@@ -28,7 +28,7 @@ async def test_decoding_stores(dut):
 
     for width in range(8):
         instr = rv.SType(offset, rs2, rs1, width)
-        dut.instr_i.value = instr.get_binary()
+        dut.instr_i.value = instr.get_binary_string()
         set_current_instr(instr)
 
         await Timer(CLK_PRD, units='ns')
@@ -86,7 +86,7 @@ async def test_decoding_itypes(dut):
     print("Testing decoding of ADDI")
 
     instr = rv.AddiInstr(rd, rs1, imm12)
-    dut.instr_i.value = instr.get_binary()
+    dut.instr_i.value = instr.get_binary_string()
     set_current_instr(instr)
 
     await Timer(CLK_PRD, units='ns')
@@ -109,7 +109,7 @@ async def test_decoding_itypes(dut):
     imm12 = 2
 
     instr = rv.AddiInstr(rd, rs1, imm12)
-    dut.instr_i.value = instr.get_binary()
+    dut.instr_i.value = instr.get_binary_string()
 
     await Timer(CLK_PRD, units='ns')
 
@@ -131,7 +131,7 @@ async def test_decoding_itypes(dut):
     imm12 = 2
 
     instr = rv.SlliInstr(rd, rs1, imm12)
-    dut.instr_i.value = instr.get_binary()
+    dut.instr_i.value = instr.get_binary_string()
 
     await Timer(CLK_PRD, units='ns')
 
@@ -160,8 +160,9 @@ async def test_decoding_rtypes(dut):
     print("Testing decoding of ADD")
     
     instr = rv.RType(rs2, rs1, F3_ADD_SUB, rd)
-    dut.instr_i.value = instr.get_binary()
-    set_current_instr(instr)
+    print(instr.get_binary_string(True))
+    dut.instr_i.value = instr.get_binary_string()
+    # set_current_instr(instr)
 
     await Timer(CLK_PRD, units='ns')
 
@@ -186,7 +187,7 @@ async def test_decoding_lui_auipc(dut):
     imm20       = 1
 
     instr = rv.UType(imm20, rd, OPC_LUI)
-    dut.instr_i.value = instr.get_binary()
+    dut.instr_i.value = instr.get_binary_string()
     set_current_instr(instr)
 
     await Timer(CLK_PRD, units='ns')
@@ -206,7 +207,7 @@ async def test_decoding_lui_auipc(dut):
     print("Testing decoding of U-Type AUIPC instruction")
 
     lui = rv.UType(imm20, rd, OPC_AUIPC)
-    dut.instr_i.value = lui.get_binary()
+    dut.instr_i.value = lui.get_binary_string()
 
     await Timer(CLK_PRD, units='ns')
 
@@ -238,7 +239,7 @@ async def test_decoding_branches(dut):
     for b_type, alu_op in zip(b_types, alu_operators):
         
         instr = rv.BType(offset, rs2, rs1, b_type)
-        dut.instr_i.value = instr.get_binary()
+        dut.instr_i.value = instr.get_binary_string()
         set_current_instr(instr)
 
         print("Branch %x" %(b_type) )
@@ -259,7 +260,7 @@ async def test_decoding_branches(dut):
     print("Testing unaligned branch")
     offset = 3
     b_instr = rv.BType(offset, rs2, rs1, F3_BLT)
-    dut.instr_i.value = b_instr.get_binary()
+    dut.instr_i.value = b_instr.get_binary_string()
 
     await Timer(CLK_PRD, units='ns')
 
@@ -286,7 +287,7 @@ async def test_decoding_jal_jalr(dut):
 
     for offset in offsets:
         instr = rv.JalInstr(offset, dest)
-        dut.instr_i.value = instr.get_binary()
+        dut.instr_i.value = instr.get_binary_string()
         set_current_instr(instr)
 
         await Timer(CLK_PRD, units='ns')
@@ -313,7 +314,7 @@ async def test_decoding_jal_jalr(dut):
 
     for offset in offsets:
         instr = rv.JalrInstr(offset, rs1, rd)
-        dut.instr_i.value = instr.get_binary()
+        dut.instr_i.value = instr.get_binary_string()
         set_current_instr(instr)
 
 
@@ -343,7 +344,7 @@ async def test_decoding_loads(dut):
 
     for width in range(4):
         instr = rv.LoadInstr(offset, rs1, width, rd)
-        dut.instr_i.value = instr.get_binary()
+        dut.instr_i.value = instr.get_binary_string()
         set_current_instr(instr)
 
         await Timer(CLK_PRD, units='ns')
