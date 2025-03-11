@@ -39,7 +39,7 @@ module alu #(
 
             //comparisons
             ALU_SLT: result_o[0] = $signed(operand_a_i) < $signed(operand_b_i);
-            ALU_SLTU:result_o[0] = operand_b_i != 0;
+            ALU_SLTU:result_o[0] = operand_a_i < operand_b_i;
             ALU_LES: result_o[0] = $signed(operand_a_i) <= $signed(operand_b_i);
             ALU_LEU: result_o[0] = operand_a_i <= operand_b_i;
             ALU_GTS: result_o[0] = $signed(operand_a_i) >  $signed(operand_b_i);
