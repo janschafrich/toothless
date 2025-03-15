@@ -3,6 +3,7 @@ import cocotb
 from cocotb.triggers import Timer
 from cocotb.binary import BinaryRepresentation, BinaryValue
 from constants_pkg import *
+import numpy as np
 
 CLK_PRD = 10
 
@@ -40,6 +41,30 @@ async def test_alu(dut):
     # testing alu operations
 
     # unsigned
+
+    print("Testing signed and unsigned additions")
+    dut.operator_i.value = ALU_ADDU
+
+    opA_opB = [ [0, 0],
+                [0, 1],
+                [1, 0],
+                [1, 1] 
+                          ]
+
+    for (operand_a, operand_b) in opA_opB:
+        
+        dut.operand_a_i.value = operand_a
+        dut.operand_b_i.value = operand_b
+
+        await Timer(CLK_PRD, units='ns')
+
+        expected_result = operand_a + operand_b
+        actual_result = int(dut.result_o.value)
+
+        assert expected_result == actual_result, \
+            f"Addition: {operand_a} + {operand_b} = {expected_result}, got {actual_result}"
+
+
     print("testing unsigned addition")
     dut.operator_i.value    = ALU_ADDU
     dut.operand_a_i.value   = BinaryValue(0, 32, bigEndian=False)
@@ -64,23 +89,48 @@ async def test_alu(dut):
     assert dut.result_o.value == 0x0, f"Expected result_o=0, got {hex(dut.result_o.value)}"
 
     # signed
-    print("Test signed addition")
+    print("Testing signed addition")
     dut.operator_i.value    = ALU_ADD
 
-    dut.operand_a_i.value   = -2
-    dut.operand_b_i.value   = -2
-    await Timer(CLK_PRD, units='ns')
-    assert dut.result_o.value.signed_integer == -4, f"Expected result_o=-4, got {hex(dut.result_o.value)}"
+    opA_opB = [ [-2, -2],
+                [2, -2],
+                [-2, 2]
+                          ]
 
-    dut.operand_a_i.value   = 2
-    dut.operand_b_i.value   = -2
-    await Timer(CLK_PRD, units='ns')
-    assert dut.result_o.value.signed_integer == 0, f"Expected result_o=-4, got {hex(dut.result_o.value)}"
+    for (operand_a, operand_b) in opA_opB:
+        
+        dut.operand_a_i.value = operand_a
+        dut.operand_b_i.value = operand_b
 
-    dut.operand_a_i.value   = -2
-    dut.operand_b_i.value   = 2
-    await Timer(CLK_PRD, units='ns')
-    assert dut.result_o.value.signed_integer == 0, f"Expected result_o=-4, got {hex(dut.result_o.value)}"
+        await Timer(CLK_PRD, units='ns')
+
+        expected_result = operand_a + operand_b
+        actual_result = np.int32(int(dut.result_o.value))
+
+        assert expected_result == actual_result, \
+            f"Addition: {operand_a} + {operand_b} = {expected_result}, got {actual_result}"
+    
+    # subtraction
+    print("Testing signed subtraction")
+    dut.operator_i.value    = ALU_SUB
+
+    opA_opB = [ [-2, -2],
+                [2, -2],
+                [-2, 2]
+                          ]
+
+    for (operand_a, operand_b) in opA_opB:
+        
+        dut.operand_a_i.value = operand_a
+        dut.operand_b_i.value = operand_b
+
+        await Timer(CLK_PRD, units='ns')
+
+        expected_result = operand_a - operand_b
+        actual_result = np.int32(int(dut.result_o.value))
+
+        assert expected_result == actual_result, \
+            f"Addition: {operand_a} - {operand_b} = {expected_result}, got {actual_result}"
 
 
     #logical
@@ -165,46 +215,18 @@ async def test_alu(dut):
                 f"Shift {hex(operand_a)} >> {hex(shift_amount)} = {hex(expected_result)}, got {hex(actual_result)}"
 
 
-    # # comparison
-    # print("Testing signed comparisons")
-    # operands_a = [0,1,-1]
-    # operands_b = [0,1,-1]
-    # alu_opcodes = [ALU_LT, ALU_LES, ALU_GTS, ALU_GES, ALU_EQ, ALU_NE]
-    # py_operators = [operator.lt, operator.le, operator.gt, operator.ge, operator.eq, operator.ne]
+    # signed comparison
+    print("Testing signed comparisons")
+    operands_a = [0,1,-1]
+    operands_b = [0,1,-1]
+    alu_opcodes = [ALU_SLT, ALU_LES, ALU_GTS, ALU_GES, ALU_EQ, ALU_NE]
+    py_operators = [operator.lt, operator.le, operator.gt, operator.ge, operator.eq, operator.ne]
   
-    # for alu_opcode, py_operator in zip(alu_opcodes, py_operators):
-    #     dut.operator_i.value = alu_opcode
-        
-    #     for operand_a in operands_a:
-    #         for operand_b in operands_b:
-    #             # dut.operand_a_i.value = BinaryValue(operand_a, 32, bigEndian=False)
-    #             # dut.operand_b_i.value = BinaryValue(operand_b, 32, bigEndian=False)
-    #             dut.operand_b_i.value.signed_integer = operand_a
-    #             dut.operand_b_i.value.signed_integer = operand_b
-
-    #             await Timer(CLK_PRD, units='ns')
-                
-    #             expected_result = int(py_operator(operand_a, operand_b))
-    #             actual_result   = int(dut.result_o.value)
-
-    #             assert expected_result == actual_result, \
-    #                 f"Comparison {hex(alu_opcode)}: {hex(operand_a)} {py_operator.__name__} {hex(operand_b)} = {expected_result}, got {actual_result}"
-
-    # comparison SLTU
-    print("Testing unsigned comparisons")
-    operands_a = [0,1]
-    operands_b = [0,1]
-
-    alu_opcodes = [ALU_LEU, ALU_GTU, ALU_GEU]
-    py_operators = [operator.le, operator.gt, operator.ge]
-
     for alu_opcode, py_operator in zip(alu_opcodes, py_operators):
         dut.operator_i.value = alu_opcode
         
         for operand_a in operands_a:
             for operand_b in operands_b:
-                # dut.operand_a_i.value = BinaryValue(operand_a, 32, bigEndian=False)
-                # dut.operand_b_i.value = BinaryValue(operand_b, 32, bigEndian=False)
                 dut.operand_a_i.value = operand_a
                 dut.operand_b_i.value = operand_b
 
@@ -214,20 +236,29 @@ async def test_alu(dut):
                 actual_result   = int(dut.result_o.value)
 
                 assert expected_result == actual_result, \
-                    f"Comparison {hex(alu_opcode)}: {hex(operand_a)} {py_operator.__name__} {hex(operand_b)} = {expected_result}, got {actual_result}"
+                    f"Comparison {hex(alu_opcode)}: {operand_a:x} {py_operator.__name__} {operand_b:x} = {bool(expected_result)}, got {bool(actual_result)}"
+
+    # unsigned comparisons
+    print("Testing unsigned comparisons")
+    operands_a = [0,1]
+    operands_b = [0,1]
+
+    alu_opcodes = [ALU_SLTU, ALU_LEU, ALU_GTU, ALU_GEU]
+    py_operators = [operator.lt, operator.le, operator.gt, operator.ge]
+
+    for alu_opcode, py_operator in zip(alu_opcodes, py_operators):
+        dut.operator_i.value = alu_opcode
+        
+        for operand_a in operands_a:
+            for operand_b in operands_b:
+                dut.operand_a_i.value = operand_a
+                dut.operand_b_i.value = operand_b
+
+                await Timer(CLK_PRD, units='ns')
                 
-    print("Testing SLTU")
-    dut.operator_i.value = ALU_SLTU
-    operands_b = [0, 1, 100]
-    expected_results = [0, 1, 1]
+                expected_result = bool(py_operator(operand_a, operand_b))
+                actual_result   = bool(dut.result_o.value)
 
-    for operand_b, expected_result in zip(operands_b, expected_results):
-        dut.operand_b_i.value = operand_b
-
-        await Timer(CLK_PRD, units='ns')
-
-        actual_result = int(dut.result_o.value)
-
-        assert expected_result == actual_result, \
-            f"ALU OPCODE {hex(alu_opcode)}: {hex(operand_b)} != 0 = {expected_result}, got {actual_result}"
-
+                assert expected_result == actual_result, \
+                    f"Comparison {hex(alu_opcode)}: {operand_a} {py_operator.__name__} {operand_b} = {expected_result}, got {actual_result}"
+                
