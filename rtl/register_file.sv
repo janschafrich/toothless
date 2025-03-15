@@ -1,5 +1,6 @@
 module register_file #(
-	parameter ADDR_WIDTH = 5,
+	parameter REG_COUNT = 32,
+	parameter ADDR_WIDTH = $clog2(32),
 	parameter DATA_WIDTH = 32
 )(
 	input  logic clk, 
@@ -19,15 +20,13 @@ module register_file #(
 	input  logic 			      we_a_i
 );
 
-	localparam N_WORDS = 2**(ADDR_WIDTH);
-
-	logic [N_WORDS-1:0]reg_file[DATA_WIDTH-1:0];		// 2D array (Matrix): word size, register count
+	logic [REG_COUNT-1:0]reg_file[DATA_WIDTH-1:0];		// 2D bit array (Matrix): word size, register count
 
 
 	always_ff @(posedge clk) begin
 		if (!rst_n) 
 		begin
-			for (integer i = 1; i < N_WORDS; i++)		// skip x0, as this is always zero
+			for (integer i = 1; i < REG_COUNT; i++)		// skip x0, as this is always zero
 			begin
 				reg_file[i] <= 32'b0;					// initialize with zero
 			end
