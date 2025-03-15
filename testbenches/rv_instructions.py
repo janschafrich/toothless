@@ -102,16 +102,6 @@ class IType(RVInstr):
         return table
     
 
-
-
-class JalrInstr(IType):
-    """ RISCV JALR opcode Instruction: imm + rs1 + funct3 + rd + opcode """
-
-    def __init__(self, offset : int, base_r : int, dest_r : int):
-        super().__init__(imm12=offset, rs1=base_r, funct3=0, rd=dest_r, opcode=OPC_JALR, mnemonic="JALR")
-
-
-
 class RType(RVInstr):
     """ RISCV R-opcode Instruction: funct7 + rs2 + rs1 + funct3 + rd + opcode """
         
@@ -173,7 +163,7 @@ class BType(RVInstr):
     
     """
 
-    def __init__(self, offset : int, rs2 : int, rs1 : int, funct3 : int):
+    def __init__(self, offset : int, rs2 : int, rs1 : int, funct3 : int, mnemonic : str = None):
 
         self.offset     = offset
         self.rs2        = np.uint8(rs2)
@@ -187,7 +177,7 @@ class BType(RVInstr):
         imm4_1          = (offset & ( 0b1111 << 1))             # extracting bits 4:1
         imm11           = (offset >> 11) & 0b1                      # getting bit 11 and moving it to position 0
         self.imm_lower  = imm4_1 + imm11
-        super().__init__(opcode=B_TYPE)
+        super().__init__(opcode=B_TYPE, mnemonic=mnemonic)
 
     
     # def get_formatted_fields(self):
@@ -202,61 +192,18 @@ class BType(RVInstr):
     #     """
 
     #     return table
+
+class BeqInstr(BType):
+    """ Instruction instantiation """
+    def __init__(self, rs1 : int, rs2 : int, imm : int):
+        super().__init__(offset=imm, rs1=rs1, rs2=rs2, funct3=F3_BEQ, mnemonic='BEQ')
     
     
 
-class JalInstr(RVInstr):
-    """ RISCV JAL opcode Instruction: imm20 + rd + opcode """
-        
-    def __init__(self, offset : int, dest : int):
-
-        self.offset     = offset
-        imm20      = (offset >> 20) & 0b1          # getting bit 20
-        imm10_1    = (offset >> 1) & 0b11_1111_1111# getting bits 10:1
-        imm11      = (offset >> 11) & 0b1          # getting bit 11
-        imm19_12   = (offset >> 12) & 0b1111_1111  # getting bits 19:12
-
-        imm     = format(imm20, '01b') \
-                + format(imm10_1, '010b') \
-                + format(imm11, '01b') \
-                + format(imm19_12, '08b') \
-                        
-        self.imm20      = int(imm, 2)
-        self.rd         = dest
-        super().__init__(mnemonic="JAL", opcode=OPC_JAL)
 
 
-    # def get_binary(self) -> np.int32:
-    #     """ Generate machine code instruction """
-
-    #     instr_str = format(self.imm20, '01b') \
-    #                 + format(self.imm10_1, '010b') \
-    #                 + format(self.imm11, '01b') \
-    #                 + format(self.imm19_12, '08b') \
-    #                 + format(self.rd, '05b') \
-    #                 + format(self.opcode, '07b') \
-
-    #     return int(instr_str, 2)
-    
-    # def get_formatted_fields(self):
-    #     """ Print instruction fields for debugging purposes in a human-readable, table-like format with right-aligned columns. """
-
-    #     table = f"""
-    #         rdx imm[20] imm[10:1] imm[11] imm[19:12] rd    opcode  
-    #         ------------------------------------------------------
-    #         0b    {format(self.imm20, '01b'):>1}    {format(self.imm10_1, '010b'):>6}   {format(self.imm11, '01b'):>1}     {format(self.imm19_12, '08b'):>8}  {format(self.rd, '05b'):>5}  {format(self.opcode, '07b'):>7}
-    #         0d    {self.imm20:>1}    {self.imm10_1:>10}   {self.imm11:>1}  {self.imm19_12:>8}   {self.rd:>5}    {self.opcode:>7}
-    #         0x    {self.imm20:>1x}    {self.imm10_1:>10x}   {self.imm11:>1x}  {self.imm19_12:>8x}   {self.rd:>5x}    {self.opcode:>7x}
-    #     """
-
-    #     return table
 
 
-class JalrInstr(IType):
-    """ RISCV JALR opcode Instruction: imm + rs1 + funct3 + rd + opcode """
-
-    def __init__(self, offset : int, base_r : int, dest_r : int):
-        super().__init__(imm12=offset, rs1=base_r, funct3=0, rd=dest_r, opcode=OPC_JALR, mnemonic="JALR")
 
 
 
@@ -379,3 +326,79 @@ class AddInstr(RType):
 
     def __init__(self, rd : int, rs1 : int, rs2 : int):
         super().__init__(rs2=rs2, rs1=rs1, funct3=F3_ADD_SUB, rd=rd, mnemonic='ADD')
+
+
+class SllInstr(RType):
+    """ RISCV instruction field definition"""
+
+    def __init__(self, rd : int, rs1 : int, rs2 : int):
+        super().__init__(rs2=rs2, rs1=rs1, funct3=F3_SLL, rd=rd, mnemonic='SLL')
+
+
+class AndInstr(RType):
+    """ RISCV instruction field definition"""
+
+    def __init__(self, rd : int, rs1 : int, rs2 : int):
+        super().__init__(rs2=rs2, rs1=rs1, funct3=F3_AND, rd=rd, mnemonic='AND')
+
+
+class OrInstr(RType):
+    """ RISCV instruction field definition"""
+
+    def __init__(self, rd : int, rs1 : int, rs2 : int):
+        super().__init__(rs2=rs2, rs1=rs1, funct3=F3_OR, rd=rd, mnemonic='OR')
+
+
+class XorInstr(RType):
+    """ RISCV instruction field definition"""
+
+    def __init__(self, rd : int, rs1 : int, rs2 : int):
+        super().__init__(rs2=rs2, rs1=rs1, funct3=F3_XOR, rd=rd, mnemonic='XOR')
+
+
+## J Type
+
+class JalrInstr(IType):
+    """ RISCV JALR opcode Instruction: imm + rs1 + funct3 + rd + opcode """
+
+    def __init__(self, rd : int, rs1 : int, offset : int):
+        super().__init__(imm12=offset, rs1=rs1, funct3=0, rd=rd, opcode=OPC_JALR, mnemonic="JALR")
+
+
+class JalInstr(RVInstr):
+    """ RISCV JAL opcode Instruction: imm20 + rd + opcode """
+        
+    def __init__(self, rd : int, offset : int, ):
+
+        self.offset     = offset
+        imm20      = (offset >> 20) & 0b1          # getting bit 20
+        imm10_1    = (offset >> 1) & 0b11_1111_1111# getting bits 10:1
+        imm11      = (offset >> 11) & 0b1          # getting bit 11
+        imm19_12   = (offset >> 12) & 0b1111_1111  # getting bits 19:12
+
+        imm     = format(imm20, '01b') \
+                + format(imm10_1, '010b') \
+                + format(imm11, '01b') \
+                + format(imm19_12, '08b') \
+                        
+        self.imm20      = int(imm, 2)
+        self.rd         = rd
+        super().__init__(mnemonic="JAL", opcode=OPC_JAL)
+
+    
+    # def get_formatted_fields(self):
+    #     """ Print instruction fields for debugging purposes in a human-readable, table-like format with right-aligned columns. """
+
+    #     table = f"""
+    #         rdx imm[20] imm[10:1] imm[11] imm[19:12] rd    opcode  
+    #         ------------------------------------------------------
+    #         0b    {format(self.imm20, '01b'):>1}    {format(self.imm10_1, '010b'):>6}   {format(self.imm11, '01b'):>1}     {format(self.imm19_12, '08b'):>8}  {format(self.rd, '05b'):>5}  {format(self.opcode, '07b'):>7}
+    #         0d    {self.imm20:>1}    {self.imm10_1:>10}   {self.imm11:>1}  {self.imm19_12:>8}   {self.rd:>5}    {self.opcode:>7}
+    #         0x    {self.imm20:>1x}    {self.imm10_1:>10x}   {self.imm11:>1x}  {self.imm19_12:>8x}   {self.rd:>5x}    {self.opcode:>7x}
+    #     """
+
+    #     return table
+
+
+    ## B Type
+

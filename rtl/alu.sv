@@ -6,9 +6,6 @@ module alu #(
     parameter DATA_WIDTH = 32,
     parameter ALU_OP_WIDTH = 5
 )(
-    input  logic                    clk,
-    input  logic                    rst_n,
-
     input  alu_opcode_e             operator_i,
     input  logic [DATA_WIDTH-1:0]   operand_a_i,
     input  logic [DATA_WIDTH-1:0]   operand_b_i,

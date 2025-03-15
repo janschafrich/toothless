@@ -48,23 +48,23 @@ package toothless_pkg;
 
     } alu_opcode_e;
 
+    parameter ALU_OP_A_SEL_REG  = 2'b00;
+    parameter ALU_OP_A_SEL_PC   = 2'b01;
+    parameter ALU_OP_A_SEL_IMM  = 2'b10;
+    parameter ALU_OP_A_SEL_ZERO = 2'b11;
 
-    parameter OP_A_REG      = 2'b00;
-    parameter OP_A_CURPC    = 2'b01;
-    parameter OP_A_IMM      = 2'b10;
-
-    parameter OP_B_REG      = 2'b00;
-    parameter OP_B_IMM      = 2'b10;
+    parameter ALU_OP_B_SEL_REG  = 2'b00;
+    parameter ALU_OP_B_SEL_IMM  = 2'b10;
 
     parameter CTRL_TRANS_SEL_NONE    = 2'b00; 
     parameter CTRL_TRANS_SEL_JUMP    = 2'b01; 
     parameter CTRL_TRANS_SEL_BRANCH  = 2'b10; 
 
-    parameter ALU_RESULT_SEL_RF = 2'b00;
-    parameter ALU_RESULT_SEL_PC = 2'b01;
-    parameter ALU_RESULT_SEL_LSU = 2'b10;
+    // parameter ALU_RESULT_SEL_RF = 2'b00;
+    // parameter ALU_RESULT_SEL_PC = 2'b01;
+    // parameter ALU_RESULT_SEL_LSU = 2'b10;
 
-
-
+    parameter RF_WP_A_SEL_ALU       = 2'b00;
+    parameter RF_WP_A_SEL_PCPLUS4   = 2'b01;
 
 endpackage

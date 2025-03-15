@@ -23,8 +23,7 @@ module decoder #(
     output logic [4:0]  rd_o,
 
     // controller signals
-    output logic [1:0]  rf_wp_mux_sel_o,           // write source: 00 ALU, 01 PC
-    output logic [1:0]  alu_result_mux_sel_o,      // where should the ALU result go: 00 RF, 01 PC, 10 LSU
+    output logic [1:0]  rf_wp_mux_sel_o,            // write source: 00 ALU, 01 PC
     output logic [1:0]  alu_op_a_mux_sel_o,          // operand a selection: reg, PC, immediate or zero
     output logic [1:0]  alu_op_b_mux_sel_o,           // operand b selection: reg or immediate
 
@@ -57,8 +56,7 @@ always_comb begin: instruction_decoder
     rs2_o       = instr_i[24:20];
     rd_o        = instr_i[11:7];
 
-    rf_wp_mux_sel_o         = 2'b00;        // ALU
-    alu_result_mux_sel_o    = ALU_RESULT_SEL_RF;        // RF
+    rf_wp_mux_sel_o         = RF_WP_A_SEL_ALU;        // ALU
     ctrl_trans_instr_o   = CTRL_TRANS_SEL_NONE;        // none
 
     data_req_o  = 1'b0;
@@ -69,8 +67,8 @@ always_comb begin: instruction_decoder
 
         R_TYPE: begin
 
-            alu_op_a_mux_sel_o = OP_A_REG;
-            alu_op_b_mux_sel_o = OP_B_REG;
+            alu_op_a_mux_sel_o = ALU_OP_A_SEL_REG;
+            alu_op_b_mux_sel_o = ALU_OP_B_SEL_REG;
 
             rs1_used_o  = 1'b1;
             rs2_used_o  = 1'b1;
@@ -138,8 +136,8 @@ always_comb begin: instruction_decoder
             imm_valid_o = 1'b1;
             imm_o       = { {20{instr_i[31]}} , instr_i[31:20] };    // sign extended 12 bit value
 
-            alu_op_a_mux_sel_o = OP_A_REG;
-            alu_op_b_mux_sel_o = OP_B_IMM;
+            alu_op_a_mux_sel_o = ALU_OP_A_SEL_REG;
+            alu_op_b_mux_sel_o = ALU_OP_B_SEL_IMM;
             
             unique case (instr_i[14:12])
 
@@ -207,13 +205,13 @@ always_comb begin: instruction_decoder
             unique case (instr_i[5])
 
                 1'b1: begin        // load upper immediate
-                    alu_op_a_mux_sel_o = OP_A_REG;      // zero register
-                    alu_op_b_mux_sel_o = OP_B_IMM;
+                    alu_op_a_mux_sel_o = ALU_OP_A_SEL_REG;      // zero register
+                    alu_op_b_mux_sel_o = ALU_OP_B_SEL_IMM;
                 end
 
                 1'b0: begin        // add upper immediate to pc
-                    alu_op_a_mux_sel_o = OP_A_CURPC;
-                    alu_op_b_mux_sel_o = OP_B_IMM;
+                    alu_op_a_mux_sel_o = ALU_OP_A_SEL_PC;
+                    alu_op_b_mux_sel_o = ALU_OP_B_SEL_IMM;
                 end
 
                 default: begin
@@ -228,8 +226,8 @@ always_comb begin: instruction_decoder
             rs1_used_o  = 1'b1;
             rs2_used_o  = 1'b1;
 
-            alu_op_a_mux_sel_o  = OP_A_REG;
-            alu_op_b_mux_sel_o  = OP_B_REG;
+            alu_op_a_mux_sel_o  = ALU_OP_A_SEL_REG;
+            alu_op_b_mux_sel_o  = ALU_OP_B_SEL_REG;
 
             ctrl_trans_instr_o = CTRL_TRANS_SEL_BRANCH;
 
@@ -255,18 +253,17 @@ always_comb begin: instruction_decoder
 
         OPC_JAL, OPC_JALR: begin
 
-            alu_op_b_mux_sel_o      = OP_B_IMM;
+            alu_op_b_mux_sel_o      = ALU_OP_B_SEL_IMM;
 
             ctrl_trans_instr_o      = CTRL_TRANS_SEL_JUMP;
-            rf_wp_mux_sel_o         = 2'b01;                    // MUX select pc_plus4
+            rf_wp_mux_sel_o         = RF_WP_A_SEL_PCPLUS4;                    // MUX select pc_plus4
             alu_operator_o          = ALU_ADD;                  // jump target
-            alu_result_mux_sel_o    = ALU_RESULT_SEL_PC;        // program counter
             rd_used_o               = 1'b1;
             imm_valid_o             = 1'b1;
 
             if (instr_i[3])     // JAL
             begin
-                alu_op_a_mux_sel_o  = OP_A_CURPC;
+                alu_op_a_mux_sel_o  = ALU_OP_A_SEL_PC;
                 imm_o[31:20]    = { 12{instr_i[31]} };
                 imm_o[19:12]    = instr_i[19:12];
                 imm_o[11]       = instr_i[20];
@@ -276,7 +273,7 @@ always_comb begin: instruction_decoder
             else                // JALR
             begin
                 rs1_used_o          = 1'b1;
-                alu_op_a_mux_sel_o  = OP_A_REG;
+                alu_op_a_mux_sel_o  = ALU_OP_A_SEL_REG;
                 imm_o               = { {21{instr_i[31]}} , instr_i[30:20]};
             end
         end
@@ -285,9 +282,8 @@ always_comb begin: instruction_decoder
         OPC_LOAD: begin
 
             alu_operator_o          = ALU_ADD;
-            alu_op_a_mux_sel_o      = OP_A_REG;     // rs1 / base
-            alu_op_b_mux_sel_o      = OP_B_IMM;     // offset
-            alu_result_mux_sel_o    = ALU_RESULT_SEL_LSU;     // LSU
+            alu_op_a_mux_sel_o      = ALU_OP_A_SEL_REG;     // rs1 / base
+            alu_op_b_mux_sel_o      = ALU_OP_B_SEL_IMM;     // offset
 
             rs1_used_o  = 1'b1;                 // base address
             rd_used_o   = 1'b1;                 // memory value destination
@@ -312,9 +308,8 @@ always_comb begin: instruction_decoder
         OPC_STORE: begin
             
             alu_operator_o          = ALU_ADD;
-            alu_op_a_mux_sel_o      = OP_A_REG;
-            alu_op_b_mux_sel_o      = OP_B_IMM;
-            alu_result_mux_sel_o    = ALU_RESULT_SEL_LSU;
+            alu_op_a_mux_sel_o      = ALU_OP_A_SEL_REG;
+            alu_op_b_mux_sel_o      = ALU_OP_B_SEL_IMM;
 
             rs1_used_o          = 1'b1;
             rs2_used_o          = 1'b1;

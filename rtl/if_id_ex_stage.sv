@@ -20,6 +20,49 @@ module if_id_ex_stage #(
     output logic                    instr_invalid_o
 );
 
+    // Signal declarations
+    // program counter
+    logic [1:0] ctrl_trans_instr;
+    logic [ADDR_WIDTH-1:0] pc;
+
+    // program counter <-> decoder
+    logic [INSTR_WIDTH-1:0]     cur_instr;
+
+    // decoder <-> alu
+    logic [ALU_OP_WIDTH-1:0]    alu_operator;
+
+
+    // decoder <-> register file
+    logic [4:0] rs1;
+    logic [4:0] rs2;
+    logic [4:0] rd;
+    logic       rf_we;
+
+    // decoder <-> control unit
+    logic [1:0]             alu_op_a_mux_sel;
+    logic [1:0]             alu_op_b_mux_sel;
+    logic [1:0]             rf_wp_mux_sel;
+    logic [DATA_WIDTH-1:0]  imm;
+    logic                   imm_valid;
+    logic                   rs1_valid;
+    logic                   rs2_valid;
+
+    // alu <-> control unit
+    logic [DATA_WIDTH-1:0] alu_result;
+    logic [DATA_WIDTH-1:0] alu_operand_a; 
+    logic [DATA_WIDTH-1:0] alu_operand_b; 
+
+    // register file <-> control unit
+    logic [ADDR_WIDTH-1:0] rf_rp_a;
+    logic [ADDR_WIDTH-1:0] rf_rp_b;
+    logic [ADDR_WIDTH-1:0] rf_wp_a;
+
+    // control unit <-> program counter
+    logic [ADDR_WIDTH-1:0] pc_plus4;
+
+
+
+    // module instantiations
     instruction_rom #() instruction_rom_i (
         .clk (clk),
         .rst_n(rst_n),
@@ -35,11 +78,11 @@ module if_id_ex_stage #(
         .clk            (clk),
         .rst_n          (rst_n),
         .ctrl_trans_instr_i(ctrl_trans_instr),
-        .offset_i       (),
-        .branch_tkn_i   (), 
-        .tgt_addr_i     (),
+        .offset_i       (imm),                  // from decoder
+        .branch_tkn_i   (alu_result[0]), 
+        .tgt_addr_i     (alu_result),
         .pc_o           (pc),
-        .pc_plus4_o     ()
+        .pc_plus4_o     (pc_plus4)
     );
 
     decoder #(
@@ -53,22 +96,21 @@ module if_id_ex_stage #(
         .alu_operator_o(alu_operator),              // select operation to be performed by ALU
 
 
-        .imm_o(alu_operand_b),           // sign/zero extended immediate value from current instruction
-        .imm_valid_o(),       // whether current instruction has an immediate value
+        .imm_o(imm),           // sign/zero extended immediate value from current instruction
+        .imm_valid_o(imm_valid),       // whether current instruction has an immediate value
 
         // register file signals
-        .rs1_used_o(),
-        .rs2_used_o(),
-        .rd_used_o(),                   // need register write
-        .rs1_o(alu_operand_a[4:0]),          // using x0 for testing 
-        .rs2_o(), 
-        .rd_o(),
+        .rs1_used_o(rs1_valid),
+        .rs2_used_o(rs2_valid),
+        .rd_used_o(rf_we),                   // need register write
+        .rs1_o(rs1),          // using x0 for testing 
+        .rs2_o(rs2), 
+        .rd_o(rd),
 
         // controller signals
-        .alu_op_a_mux_sel_o(),          // operand a selection: reg, PC, immediate or zero
-        .alu_op_b_mux_sel_o(),           // operand b selection: reg or immediate
-        .rf_wp_mux_sel_o(),           // write source: 00 ALU, 01 PC
-        .alu_result_mux_sel_o(),      // where should the ALU result go: 00 RF, 01 PC, 10 LSU
+        .alu_op_a_mux_sel_o(alu_op_a_mux_sel),          // operand a selection: reg, PC, immediate or zero
+        .alu_op_b_mux_sel_o(alu_op_b_mux_sel),           // operand b selection: reg or immediate
+        .rf_wp_mux_sel_o(rf_wp_mux_sel),                             // write source: 00 RF, 01 PC
 
         // program counter signals
         .ctrl_trans_instr_o(ctrl_trans_instr),      // current instr is control transfer, 00 none, 01 jump, 10 branch
@@ -87,28 +129,56 @@ module if_id_ex_stage #(
         .DATA_WIDTH (DATA_WIDTH),
         .ALU_OP_WIDTH (ALU_OP_WIDTH)   
     ) alu_i (
-        .clk    (clk),
-        .rst_n  (rst_n),
-
         .operator_i (alu_operator),
         .operand_a_i(alu_operand_a),
         .operand_b_i(alu_operand_b),
-
-        .result_o (result_o)
+        .result_o   (alu_result)
     );
 
-    // program counter
-    logic [1:0] ctrl_trans_instr;
-    logic [ADDR_WIDTH-1:0] pc;
+    register_file #(
+        .REG_COUNT(32),
+        .DATA_WIDTH(DATA_WIDTH)
+    ) register_file_i (
+        .clk        (clk),
+        .rst_n      (rst_n),
+        .raddr_a_i  (rs1),
+        .rdata_a_o  (rf_rp_a),
+        .raddr_b_i  (rs2),
+        .rdata_b_o  (rf_rp_b),
+        .waddr_a_i  (rd),
+        .wdata_a_i  (rf_wp_a),
+        .we_a_i     (rf_we)
+    );
 
-    // program counter <-> decoder
-    logic [INSTR_WIDTH-1:0]     cur_instr;
+    control_unit #(
+        .DATA_WIDTH(DATA_WIDTH),
+        .ADDR_WIDTH(ADDR_WIDTH)
+    ) control_unit_i (
+        // Decoder
+        .alu_op_a_mux_sel_i     (alu_op_a_mux_sel),
+        .alu_op_b_mux_sel_i     (alu_op_b_mux_sel),
+        .rs1_valid_i            (rs1_valid),
+        .rs2_valid_i            (rs2_valid),
+        .imm_valid_i            (imm_valid),   
+        .imm_i                  (imm),  
+        .rf_rp_a_i              (rf_rp_a),
+        .rf_rp_b_i              (rf_rp_b),
 
-    // decoder <-> alu
-    logic [ALU_OP_WIDTH-1:0]    alu_operator;
-    logic [DATA_WIDTH-1:0]      alu_operand_a; 
-    logic [DATA_WIDTH-1:0]      alu_operand_b; 
+        // ALU
+        .alu_op_a_o             (alu_operand_a),
+        .alu_op_b_o             (alu_operand_b),
+        .alu_result_i           (alu_result),
+        // register file
+        .rf_wp_mux_sel_i        (rf_wp_mux_sel),
+        .rf_wp_o                (rf_wp_a),
+        // program counter
+        .pc_i                   (pc),
+        .pc_plus4_i             (pc_plus4)
+    );
 
     assign cur_instr_o = cur_instr;
+
+    assign result_o = alu_result;
+
 
 endmodule

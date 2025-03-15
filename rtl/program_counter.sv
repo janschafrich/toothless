@@ -34,7 +34,7 @@ module program_counter #(
 			case (ctrl_trans_instr_i)
 				CTRL_TRANS_SEL_NONE: 	pc_o <= pc_o + 4;
 				CTRL_TRANS_SEL_JUMP: 	pc_o <= tgt_addr_i;
-				CTRL_TRANS_SEL_BRANCH: 	if (branch_tkn_i) pc_o <= pc_o + offset_i;
+				CTRL_TRANS_SEL_BRANCH: 	pc_o <= branch_tkn_i ? pc_o + offset_i : pc_o + 4;
 				default:				pc_o <= pc_o + 4;
 			endcase
 		end

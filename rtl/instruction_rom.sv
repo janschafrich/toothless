@@ -11,14 +11,14 @@ module instruction_rom(
 	always_comb begin
 		case(addr_i[31:0])	// lookup table - instructions from Steven Hoover RISC-V tutorial https://github.com/stevehoover/LF-Building-a-RISC-V-CPU-Core.git
 			//                        imm         rs1 funct3 rd   opcode
-			32'h0:     rom_data = 32'b000000010101_00000_000_00001_0010011;    // ADDI x1, x0, 21
-			32'h4:     rom_data = 32'b111111111111_00000_000_00001_0010011;    // ADDI x1, x0, 4095
-			32'h8:     rom_data = 32'b000000011111_00010_010_00001_0010011;    // SLTI x1, x2, 31
-			32'hc:     rom_data = 32'b000000000010_11111_011_00001_0010011;    // SLTIU x1, x31, 2
-			32'h10:    rom_data = 32'b000000011111_11111_100_00001_0010011;    // XORI x1, x31, 31
-			32'h14:    rom_data = 32'b000000000110_11111_110_00001_0010011;    // ORI x1, x31, 6
-			32'h18:    rom_data = 32'b000000000110_11111_111_00001_0010011;    // ANDI x1, x31, 6
-			32'h1c:    rom_data = 32'b000000000010_11111_001_00001_0010011;    // SLLI x1, x31, 2
+            32'h0: rom_data = 32'b000000000001_00000_000_00001_0010011;    // ADDI x1 x0 1
+            32'h4: rom_data = 32'b000000000010_00000_000_00010_0010011;    // ADDI x2 x0 2
+            32'h8: rom_data = 32'b0000000_00010_00001_000_00011_0110011;    // ADD x3 x1 x2
+            32'hc: rom_data = 32'b0100000_00010_00011_001_00100_0110011;    // SLL x4 x3 x2
+            32'h10: rom_data = 32'b0000000_00011_00100_110_00101_0110011;    // OR x5 x4 x3
+            32'h14: rom_data = 32'b0000000_00101_00011_111_00110_0110011;    // AND x6 x3 x5
+            32'h18: rom_data = 32'b0000000_00100_00011_100_00111_0110011;    // XOR x7 x3 x4
+            32'h1c: rom_data = 32'b1111111_00111_00101_000_10101_1100011;    // BEQ x5 x7
 			default: rom_data = 32'haaaa_aaaa;
 		endcase
     end
