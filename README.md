@@ -1,12 +1,10 @@
 # toothless - Mission
 
-design  minimal RV32I core
-
-test it - verilator
-
-do logic synthesis - yosys
-
-do physical synthesis - yosys
+- design  minimal RV32I core
+- test it - verilator
+- do logic synthesis - yosys
+- do physical synthesis - yosys
+- try SystemVerilog assertions
 
 # Core - Toothless
 
@@ -24,6 +22,7 @@ Setup Verilator Path
 ```
 export VERILATOR_ROOT=/home/jscha/projects/verilator
 export PATH=$VERILATOR_ROOT/bin:$PATH
+export PATH=/home/jscha/.config/mlonmcu/environments/default/deps/install/riscv_gcc/bin:$PATH
 export PATH="/home/jscha/projects/oss-cad-suite/bin:$PATH"
 ```
 

@@ -60,11 +60,8 @@ package toothless_pkg;
     parameter CTRL_TRANS_SEL_JUMP    = 2'b01; 
     parameter CTRL_TRANS_SEL_BRANCH  = 2'b10; 
 
-    // parameter ALU_RESULT_SEL_RF = 2'b00;
-    // parameter ALU_RESULT_SEL_PC = 2'b01;
-    // parameter ALU_RESULT_SEL_LSU = 2'b10;
-
     parameter RF_WP_A_SEL_ALU       = 2'b00;
     parameter RF_WP_A_SEL_PCPLUS4   = 2'b01;
+    parameter RF_WP_A_SEL_LSU       = 2'b10;
 
 endpackage

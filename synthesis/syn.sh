@@ -10,10 +10,18 @@ RTL_ROOT=$TOOTHLESS_ROOT/rtl
 SYN_ROOT=$TOOTHLESS_ROOT/synthesis
 
 
-RTL_SRC="$RTL_ROOT/load_store_unit.sv \
-        $RTL_ROOT/data_tcm.sv"
+RTL_SRC="$RTL_ROOT/toothless_pkg.sv \
+        $RTL_ROOT/control_unit.sv \
+        $RTL_ROOT/alu.sv \
+        $RTL_ROOT/register_file.sv \
+        $RTL_ROOT/program_counter.sv \
+        $RTL_ROOT/decoder.sv \
+        $RTL_ROOT/instruction_rom.sv \
+        $RTL_ROOT/load_store_unit.sv \
+        $RTL_ROOT/if_id_ex_stage.sv \
+         $RTL_ROOT/data_tcm.sv"
 
-TOP=load_store_unit
+TOP=if_id_ex_stage
 
 if [[ "$TASK" == "stats" ]]
 then

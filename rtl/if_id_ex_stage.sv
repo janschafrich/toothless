@@ -60,6 +60,15 @@ module if_id_ex_stage #(
     // control unit <-> program counter
     logic [ADDR_WIDTH-1:0] pc_plus4;
 
+    // decoder <-> load store unit
+    logic [ADDR_WIDTH-1:0]  mem_addr;
+    logic                   mem_we;               // 0 read access, 1 write access
+    logic                   mem_data_req;         // ongoing request to the LSU
+    logic [1:0]             mem_data_type;        // 00 byte, 01 halfword, 10 word
+    logic                   mem_data_sign_ext;    // sign extension or zero extension
+
+    // control <-> load store unit
+    logic [DATA_WIDTH-1:0]  mem_rdata;
 
 
     // module instantiations
@@ -102,8 +111,8 @@ module if_id_ex_stage #(
         // register file signals
         .rs1_used_o(rs1_valid),
         .rs2_used_o(rs2_valid),
-        .rd_used_o(rf_we),                   // need register write
-        .rs1_o(rs1),          // using x0 for testing 
+        .rd_used_o(rf_we),                              // need register write
+        .rs1_o(rs1),                                     
         .rs2_o(rs2), 
         .rd_o(rd),
 
@@ -116,12 +125,12 @@ module if_id_ex_stage #(
         .ctrl_trans_instr_o(ctrl_trans_instr),      // current instr is control transfer, 00 none, 01 jump, 10 branch
 
         // load store unit signals
-        .data_req_o(),                   // request data memory access
-        .data_type_o(),                // word, half word, byte for LSU
-        .data_we_o(),                    // write or read to memory
-        .data_sign_ext_o(),            // whether or not data from memory is to be sign extended
+        .data_req_o(mem_data_req),                  // request data memory access
+        .data_type_o(mem_data_type),                // word, half word, byte for LSU
+        .data_we_o(mem_we),                         // write or read to memory
+        .data_sign_ext_o(mem_data_sign_ext),        // whether or not data from memory is to be sign extended
 
-        .instr_invalid_o(instr_invalid_o)                    // everything not part of RV32I is invalid
+        .instr_invalid_o(instr_invalid_o)           // everything not part of RV32I is invalid
     );
 
 
@@ -144,7 +153,7 @@ module if_id_ex_stage #(
         .raddr_a_i  (rs1),
         .rdata_a_o  (rf_rp_a),
         .raddr_b_i  (rs2),
-        .rdata_b_o  (rf_rp_b),
+        .rdata_b_o  (rf_rp_b),          // connected to write port of memory
         .waddr_a_i  (rd),
         .wdata_a_i  (rf_wp_a),
         .we_a_i     (rf_we)
@@ -173,7 +182,31 @@ module if_id_ex_stage #(
         .rf_wp_o                (rf_wp_a),
         // program counter
         .pc_i                   (pc),
-        .pc_plus4_i             (pc_plus4)
+        .pc_plus4_i             (pc_plus4),
+
+        // 
+        .mem_rdata_i            (mem_rdata)
+    );
+
+
+    load_store_unit # (
+        .DATA_WIDTH(DATA_WIDTH),
+        .ADDR_WIDTH(ADDR_WIDTH)
+    ) load_store_unit_i (
+        .clk(clk),
+        
+        // from decoder
+        .addr_i         (mem_addr),
+        .we_i           (mem_we),               // 0 read access, 1 write access
+        .data_req_i     (mem_data_req),          // ongoing request to the LSU
+        .data_type_i    (mem_data_type),        // 00 byte, 01 halfword, 10 word
+        .data_sign_ext_i(mem_data_sign_ext),    // load with sign extension
+
+        // stores - from register file
+        .wdata_i        (rf_rp_b),              // rs2 
+
+        // loads - to register file
+        .rdata_o        (mem_rdata)             // rd
     );
 
     assign cur_instr_o = cur_instr;

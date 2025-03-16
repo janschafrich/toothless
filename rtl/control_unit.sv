@@ -30,7 +30,10 @@ module control_unit # (
     output logic [ADDR_WIDTH-1:0] rf_wp_o,
     // program counter
     input  logic [ADDR_WIDTH-1:0] pc_plus4_i,
-    input  logic [ADDR_WIDTH-1:0] pc_i
+    input  logic [ADDR_WIDTH-1:0] pc_i,
+
+    // memory
+    input  logic [DATA_WIDTH-1:0] mem_rdata_i
 );
 
     logic [ADDR_WIDTH-1:0] rf_wp;
@@ -58,9 +61,10 @@ module control_unit # (
         unique case (rf_wp_mux_sel_i)
             RF_WP_A_SEL_ALU:     rf_wp_o = alu_result_i;
             RF_WP_A_SEL_PCPLUS4: rf_wp_o = pc_plus4_i;
+            RF_WP_A_SEL_LSU:     rf_wp_o = mem_rdata_i;  
             default :            rf_wp_o = alu_result_i;
         endcase
     end
     
 
-endmodule;
+endmodule

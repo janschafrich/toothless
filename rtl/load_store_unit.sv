@@ -23,7 +23,7 @@ module load_store_unit #(
     input  logic [DATA_WIDTH-1:0]   wdata_i,
 
     // to register file
-    output logic [DATA_WIDTH-1:0]   rdata_ext_o
+    output logic [DATA_WIDTH-1:0]   rdata_o
 );
 
     data_tcm #(
@@ -32,7 +32,7 @@ module load_store_unit #(
         .SIZE_LAU(1024)
     )data_tcm_i (
         .clk    (clk),
-        .data_i (wdata_i),
+        .data_i (wdata),
         .addr_i (addr_i),
         .be_i   (data_be),
         .we_i   (we_i),
@@ -41,9 +41,11 @@ module load_store_unit #(
 
     logic [3:0] data_be;                 // byte enable, one hot encoding
 
+    logic [DATA_WIDTH-1:0]  wdata;
     logic [DATA_WIDTH-1:0]  rdata;
     logic [DATA_WIDTH-1:0]  rdata_ext;
 
+    assign wdata = (data_req_i && we_i) ? wdata_i : 0; 
 
     // single MUX for rdata_ext and data_be
     always_comb begin
@@ -77,6 +79,6 @@ module load_store_unit #(
         endcase
     end
 
-    assign rdata_ext_o  = rdata_ext;
+    assign rdata_o  = rdata_ext;
 
 endmodule

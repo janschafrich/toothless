@@ -256,8 +256,8 @@ always_comb begin: instruction_decoder
             alu_op_b_mux_sel_o      = ALU_OP_B_SEL_IMM;
 
             ctrl_trans_instr_o      = CTRL_TRANS_SEL_JUMP;
-            rf_wp_mux_sel_o         = RF_WP_A_SEL_PCPLUS4;                    // MUX select pc_plus4
-            alu_operator_o          = ALU_ADD;                  // jump target
+            rf_wp_mux_sel_o         = RF_WP_A_SEL_PCPLUS4;              // MUX select pc_plus4
+            alu_operator_o          = ALU_ADD;                          // jump target
             rd_used_o               = 1'b1;
             imm_valid_o             = 1'b1;
 
