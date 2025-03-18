@@ -38,10 +38,20 @@ cd rtl
 make DUT=alu
 ```
 
+
+
+
 View Waveform (uses GTKwaves)
 ```
 make waves
 ```
+
+## Simulate Hex File / Assembly
+
+for now
+- test.hex must be in the same dir as the makefile
+- remove the @10074 from the beginning of the file
+- after reset, pc starts from address zero
 
 # Synthesis Yosys
 

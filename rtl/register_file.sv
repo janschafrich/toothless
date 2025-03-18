@@ -20,7 +20,7 @@ module register_file #(
 	input  logic 			      we_a_i
 );
 
-	logic [REG_COUNT-1:0]reg_file[DATA_WIDTH-1:0];		// 2D bit array (Matrix): word size, register count
+	logic [DATA_WIDTH-1:0] reg_file [0:REG_COUNT-1];		// 2D bit array (Matrix): word size, register count
 
 
 	always_ff @(posedge clk) begin

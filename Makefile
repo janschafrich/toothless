@@ -1,10 +1,10 @@
-# Makefile for toothless
+# Makefile for toothless project
 
 export PYTHONPATH 		:= $(PWD)/verification/unittests:$(PYTHONPATH)
 # export VERILATOR_ROOT 	:= /home/jscha/projects/verilator
 # export $(PATH)				:= $(VERILATOR_ROOT)/bin:$(PATH)
 
-DUT				?=
+DUT				?= if_id_ex_stage
 SIM             ?= verilator
 TOPLEVEL_LANG   ?= verilog
 EXTRA_ARGS      += --trace --trace-structs
@@ -40,6 +40,7 @@ VERILOG_SOURCES += \
 	$(RTL_DIR)/alu.sv \
 	$(RTL_DIR)/control_unit.sv \
 	$(RTL_DIR)/decoder.sv \
+	$(RTL_DIR)/instruction_mem.sv \
 	$(RTL_DIR)/instruction_rom.sv \
 	$(RTL_DIR)/load_store_unit.sv \
 	$(RTL_DIR)/data_tcm.sv \
@@ -48,8 +49,8 @@ VERILOG_SOURCES += \
 
 VERILATOR_FLAGS = \
 	#-Wall
-
-
+# VERILATOR_ARGS += +vmem+if_id_ex_stage.instruction_mem.mem=test.hex
+VERILATOR_ARGS += +vmem+test.hex
 
 # TOPLEVEL is the name of the toplevel module in your Verilog or VHDL file
 TOPLEVEL        = $(DUT)
@@ -63,12 +64,12 @@ include $(shell cocotb-config --makefiles)/Makefile.sim
 
 .PHONY:lint
 lint: $(RTL_DIR)/$(DUT).sv
-	verilator --lint-only $(VERILATOR_FLAGS) $(VERILOG_SOURCES)
+	verilator --lint-only $(VERILATOR_FLAGS) $(VERILATOR_ARGS) $(VERILOG_SOURCES) 
 
 
 .PHONY:waves
 waves: dump.vcd
-	gtkwave dump.vcd
+	gtkwave dump.vcd &
 
 
 .PHONY:stats

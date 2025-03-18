@@ -31,7 +31,6 @@ module if_id_ex_stage #(
     // decoder <-> alu
     logic [ALU_OP_WIDTH-1:0]    alu_operator;
 
-
     // decoder <-> register file
     logic [4:0] rs1;
     logic [4:0] rs2;
@@ -72,12 +71,16 @@ module if_id_ex_stage #(
 
 
     // module instantiations
-    instruction_rom #() instruction_rom_i (
-        .clk (clk),
-        .rst_n(rst_n),
+    // instruction_rom #() instruction_rom_i (
+    //     .clk (clk),
+    //     .rst_n(rst_n),
+    //     .addr_i(pc),
+    //     .instr_o(cur_instr)
+    // );
+    instruction_mem #() instruction_mem_i (
         .addr_i(pc),
-        .instr_o(cur_instr)
-    );
+        .data_o(cur_instr)
+    ) ;
 
 
     program_counter #(

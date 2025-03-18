@@ -28,6 +28,7 @@ module program_counter #(
 	begin	
 		if (!rst_n) begin
 			pc_o		<= 0;
+			// pc_o		<= 'h10074;
 		end 
 		else begin
 
