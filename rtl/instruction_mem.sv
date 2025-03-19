@@ -26,7 +26,7 @@ module instruction_mem #(
 
     // load machine code to execute during simulation
     initial begin
-        $readmemh("test.hex", mem);
+        $readmemh("verification/system/test.hex", mem);
     end
 
 endmodule

@@ -48,9 +48,17 @@ make waves
 
 ## Simulate Hex File / Assembly
 
+create test.hex from test.s
+```
+make bin
+```
+run test.hex
+```
+make DUT=if_id_ex_stage
+```
+
 for now
-- test.hex must be in the same dir as the makefile
-- remove the @10074 from the beginning of the file
+- remove the @10074 from the beginning of test.hex
 - after reset, pc starts from address zero
 
 # Synthesis Yosys

@@ -12,6 +12,11 @@ rtl/alu_old.sv
 rtl/top.sv
 
 verification/unittests/__pycache__
+verification/system/test.bin
+verification/system/test.dump
+verification/system/test.elf
+verification/system/test.o
+
 
 utils
 

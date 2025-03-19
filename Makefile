@@ -50,7 +50,7 @@ VERILOG_SOURCES += \
 VERILATOR_FLAGS = \
 	#-Wall
 # VERILATOR_ARGS += +vmem+if_id_ex_stage.instruction_mem.mem=test.hex
-VERILATOR_ARGS += +vmem+test.hex
+VERILATOR_ARGS += +vmem+$(OUTPUT_DIR)/test.hex
 
 # TOPLEVEL is the name of the toplevel module in your Verilog or VHDL file
 TOPLEVEL        = $(DUT)
