@@ -35,4 +35,4 @@ async def test_riscv_cpu(dut):
         await Timer(10, units="ns")
 
     # Check the result in register x4 (success or fail)
-    assert dut.register_file_i.reg_file[4].value == 0xBEEF, "Test failed!"
+    assert dut.register_file_i.reg_file[31].value == 0xBEEF, "Test failed!"
