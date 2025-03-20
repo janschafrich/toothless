@@ -284,6 +284,7 @@ always_comb begin: instruction_decoder
             alu_operator_o          = ALU_ADD;
             alu_op_a_mux_sel_o      = ALU_OP_A_SEL_REG;     // rs1 / base
             alu_op_b_mux_sel_o      = ALU_OP_B_SEL_IMM;     // offset
+            rf_wp_mux_sel_o         = RF_WP_A_SEL_LSU;
 
             rs1_used_o  = 1'b1;                 // base address
             rd_used_o   = 1'b1;                 // memory value destination

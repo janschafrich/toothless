@@ -36,7 +36,6 @@ module control_unit # (
     input  logic [DATA_WIDTH-1:0] mem_rdata_i
 );
 
-    logic [ADDR_WIDTH-1:0] rf_wp;
 
     always_comb begin : alu_op_a_mux
         unique case (alu_op_a_mux_sel_i)

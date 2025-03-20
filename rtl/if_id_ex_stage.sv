@@ -60,7 +60,7 @@ module if_id_ex_stage #(
     logic [ADDR_WIDTH-1:0] pc_plus4;
 
     // decoder <-> load store unit
-    logic [ADDR_WIDTH-1:0]  mem_addr;
+    // logic [ADDR_WIDTH-1:0]  mem_addr;
     logic                   mem_we;               // 0 read access, 1 write access
     logic                   mem_data_req;         // ongoing request to the LSU
     logic [1:0]             mem_data_type;        // 00 byte, 01 halfword, 10 word
@@ -199,7 +199,7 @@ module if_id_ex_stage #(
         .clk(clk),
         
         // from decoder
-        .addr_i         (mem_addr),
+        .addr_i         (alu_result),
         .we_i           (mem_we),               // 0 read access, 1 write access
         .data_req_i     (mem_data_req),          // ongoing request to the LSU
         .data_type_i    (mem_data_type),        // 00 byte, 01 halfword, 10 word
