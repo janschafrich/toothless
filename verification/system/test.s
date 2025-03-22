@@ -1,8 +1,13 @@
+# tests for the load store unit
+# https://projectf.io/posts/riscv-load-store/
+# https://projectf.io/posts/riscv-cheat-sheet/
+# (c) Jan-Eric Schäfrich
+
+
 .section .text
 .global _start
 
-# test for the load store unit
-# https://projectf.io/posts/riscv-load-store/
+
 _start:
     li x1, 4            # write 4 into x1
     li x2, 2            # write 2 into x2

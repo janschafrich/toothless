@@ -57,9 +57,6 @@ run test.hex
 make DUT=if_id_ex_stage
 ```
 
-for now
-- remove the @10074 from the beginning of test.hex
-- after reset, pc starts from address zero
 
 # Synthesis Yosys
 

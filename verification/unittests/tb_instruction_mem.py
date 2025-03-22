@@ -21,40 +21,12 @@ async def test_instruction_mem(dut):
 
     # await cocotb.start(generate_clock(dut))     # run in background/parallel
 
-    for addr in range (10):
+    for addr in range (0x10074, 0x10090):
         dut.addr_i.value = addr
 
         print(hex(dut.data_o.value))
 
         await Timer(CLK_PRD, units='ns')
-
-
-    # values = [1, 2, 512, 65536]
-    # bes = [0b0001, 0b0001, 0b0011, 0b1111]
-    # # masks = [0xFF, 0xFF, 0xFFFF, 0xFFFF_FFFF]
-    # addrs = [0, 1, 3, 12]
-
-    # for value, addr, be in zip(values, addrs, bes):
-    #     dut.data_i.value        = value
-    #     print_signal(dut.data_i)
-    #     dut.addr_i.value        = addr
-    #     print_signal(dut.addr_i)
-    #     dut.we_i.value          = 1
-    #     dut.be_i.value          = be
-
-    #     await Timer(CLK_PRD, units='ns')
-
-
-    # # read    
-    # print("reading")
-    # dut.we_i.value          = 0 
-
-    # for value, addr in zip(values, addrs):
-    #     dut.addr_i.value    = addr
-
-    #     await Timer(CLK_PRD, units='ns')
-    #     print_signal(dut.data_o)
-    #     # assert_response(dut.data_o , value)
 
 
 

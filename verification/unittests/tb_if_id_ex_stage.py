@@ -23,16 +23,18 @@ async def test_riscv_cpu(dut):
 
 
     # Reset
-    dut.rst_n.value = 0                           
+    dut.rst_n.value = 0                             # active low reset                     
 
     await Timer(3*CLK_PRD, units='ns')
     print("Test Reset")
     dut.rst_n.value = 1                              # release reset
 
 
+
     # Run for some time
+    print("Beginning instruction execution")
     for _ in range(1000):  
         await Timer(10, units="ns")
 
-    # Check the result in register x4 (success or fail)
+    # Check the result in register x31 (success or fail)
     assert dut.register_file_i.reg_file[31].value == 0xBEEF, "Test failed!"

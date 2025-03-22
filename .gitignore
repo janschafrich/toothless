@@ -22,3 +22,5 @@ utils
 
 synthesis/stat.log
 synthesis/*.v
+
+archive

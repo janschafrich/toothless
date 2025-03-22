@@ -40,7 +40,6 @@ VERILOG_SOURCES += \
 	$(RTL_DIR)/alu.sv \
 	$(RTL_DIR)/control_unit.sv \
 	$(RTL_DIR)/decoder.sv \
-	$(RTL_DIR)/instruction_mem.sv \
 	$(RTL_DIR)/instruction_rom.sv \
 	$(RTL_DIR)/load_store_unit.sv \
 	$(RTL_DIR)/data_tcm.sv \
@@ -49,7 +48,7 @@ VERILOG_SOURCES += \
 
 VERILATOR_FLAGS = \
 	#-Wall
-# VERILATOR_ARGS += +vmem+if_id_ex_stage.instruction_mem.mem=test.hex
+# VERILATOR_ARGS += +vmem+if_id_ex_stage.instruction_rom.mem=test.hex
 VERILATOR_ARGS += +vmem+$(OUTPUT_DIR)/test.hex
 
 # TOPLEVEL is the name of the toplevel module in your Verilog or VHDL file
@@ -88,7 +87,7 @@ $(ELF_FILE): $(OBJ_FILE)
 
 $(BIN_FILE): $(ELF_FILE)
 	$(RISCV_OBJCOPY) -O binary $< $@
-	$(RISCV_OBJDUMP) -D $< > $(DUMP_FILE)  # Generate disassembly for debugging
+	$(RISCV_OBJDUMP) -D $< > $(DUMP_FILE)  		# Generate disassembly for debugging
 	$(RISCV_OBJCOPY) -O verilog $< $(HEX_FILE)  # Generate Verilog hex format
 
 

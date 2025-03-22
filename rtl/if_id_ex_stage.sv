@@ -60,7 +60,6 @@ module if_id_ex_stage #(
     logic [ADDR_WIDTH-1:0] pc_plus4;
 
     // decoder <-> load store unit
-    // logic [ADDR_WIDTH-1:0]  mem_addr;
     logic                   mem_we;               // 0 read access, 1 write access
     logic                   mem_data_req;         // ongoing request to the LSU
     logic [1:0]             mem_data_type;        // 00 byte, 01 halfword, 10 word
@@ -70,14 +69,9 @@ module if_id_ex_stage #(
     logic [DATA_WIDTH-1:0]  mem_rdata;
 
 
+
     // module instantiations
-    // instruction_rom #() instruction_rom_i (
-    //     .clk (clk),
-    //     .rst_n(rst_n),
-    //     .addr_i(pc),
-    //     .instr_o(cur_instr)
-    // );
-    instruction_mem #() instruction_mem_i (
+    instruction_rom #() instruction_rom_i (
         .addr_i(pc),
         .data_o(cur_instr)
     ) ;
@@ -212,8 +206,9 @@ module if_id_ex_stage #(
         .rdata_o        (mem_rdata)             // rd
     );
 
-    assign cur_instr_o = cur_instr;
 
+    // for debugging
+    assign cur_instr_o = cur_instr;
     assign result_o = alu_result;
 
 
