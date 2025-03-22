@@ -26,7 +26,7 @@ module instruction_rom #(
 
     // load machine code to execute during simulation
     initial begin
-        $readmemh("verification/system/test.hex", mem);
+        $readmemh("verification/system/build/asm_test.hex", mem);
     end
 
 endmodule

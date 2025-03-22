@@ -4,6 +4,7 @@
 //  32bit integer:  A0B0C0D0
 //  byte addresses: n+3 n+2 n+1 n
 
+import toothless_pkg::*;
 
 module load_store_unit #(
     parameter DATA_WIDTH = 32,
@@ -25,6 +26,11 @@ module load_store_unit #(
     // to register file
     output logic [DATA_WIDTH-1:0]   rdata_o
 );
+    
+    logic [3:0]             data_be;     // byte enable, one hot encoding
+    logic [DATA_WIDTH-1:0]  wdata;
+    logic [DATA_WIDTH-1:0]  rdata;
+    logic [DATA_WIDTH-1:0]  rdata_ext;
 
     data_tcm #(
         .DATA_WIDTH(DATA_WIDTH),
@@ -38,12 +44,6 @@ module load_store_unit #(
         .we_i   (we_i),
         .data_o (rdata)             // to sign/zero extension
     );
-
-    logic [3:0] data_be;                 // byte enable, one hot encoding
-
-    logic [DATA_WIDTH-1:0]  wdata;
-    logic [DATA_WIDTH-1:0]  rdata;
-    logic [DATA_WIDTH-1:0]  rdata_ext;
 
     assign wdata = (data_req_i && we_i) ? wdata_i : 0; 
 

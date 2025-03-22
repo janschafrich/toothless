@@ -1,5 +1,5 @@
 
-
+import toothless_pkg::*;
 
 module program_counter #(
 	INSTR_WIDTH = 32,
@@ -40,7 +40,6 @@ module program_counter #(
 
 	end
 
-	// assign pc_o 	= pc_next;
 	// point to the next instruction, used as return address by JAL and JALR
 	assign pc_plus4_o = pc_o + 4;
 

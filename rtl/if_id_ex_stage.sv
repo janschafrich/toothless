@@ -29,7 +29,7 @@ module if_id_ex_stage #(
     logic [INSTR_WIDTH-1:0]     cur_instr;
 
     // decoder <-> alu
-    logic [ALU_OP_WIDTH-1:0]    alu_operator;
+    alu_opcode_e    alu_operator;
 
     // decoder <-> register file
     logic [4:0] rs1;

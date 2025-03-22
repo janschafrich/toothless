@@ -1,3 +1,6 @@
+
+import toothless_pkg::*;
+
 module register_file #(
 	parameter REG_COUNT = 32,
 	parameter ADDR_WIDTH = $clog2(32),
@@ -26,7 +29,7 @@ module register_file #(
 	always_ff @(posedge clk) begin
 		if (!rst_n) 
 		begin
-			for (integer i = 1; i < REG_COUNT; i++)		// skip x0, as this is always zero
+			for (integer i = 0; i < REG_COUNT; i++)		// skip x0, as this is always zero
 			begin
 				reg_file[i] <= 32'b0;					// initialize with zero
 			end
@@ -40,7 +43,7 @@ module register_file #(
 		end
 	end
 
-	assign reg_file[0] = 32'b0;
+	// assign reg_file[0] = 32'b0;
 	assign rdata_a_o = reg_file[raddr_a_i];
 	assign rdata_b_o = reg_file[raddr_b_i];
 
