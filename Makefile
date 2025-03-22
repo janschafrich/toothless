@@ -5,6 +5,7 @@ export PYTHONPATH 		:= $(PWD)/verification/unittests:$(PYTHONPATH)
 # export $(PATH)				:= $(VERILATOR_ROOT)/bin:$(PATH)
 
 DUT				?= if_id_ex_stage
+ASM_TEST 		?= test
 SIM             ?= verilator
 TOPLEVEL_LANG   ?= verilog
 EXTRA_ARGS      += --trace --trace-structs
@@ -14,7 +15,7 @@ UNITTESTS_DIR   = verification/unittests
 SYSTEMTESTS_DIR = $(PWD)/verification/system
 SYNTHESIS_DIR   = $(PWD)/synthesis
 ASSEMBLY_DIR 	= verification/system
-OUTPUT_DIR 		= verification/system
+ASSEMBLY_BUILD_DIR 	= $(ASSEMBLY_DIR)/build
 
 # assembly compilation
 RISCV_GCC 		= riscv32-unknown-elf-gcc
@@ -24,13 +25,12 @@ RISCV_OBJCOPY 	= riscv32-unknown-elf-objcopy
 RISCV_OBJDUMP 	= riscv32-unknown-elf-objdump
 
 ARCH = -march=rv32i -mabi=ilp32
-TEST_NAME 	= test
-ASM_FILE 	= $(ASSEMBLY_DIR)/$(TEST_NAME).s
-OBJ_FILE 	= $(OUTPUT_DIR)/$(TEST_NAME).o
-ELF_FILE 	= $(OUTPUT_DIR)/$(TEST_NAME).elf
-BIN_FILE 	= $(OUTPUT_DIR)/$(TEST_NAME).bin
-HEX_FILE 	= $(OUTPUT_DIR)/$(TEST_NAME).hex
-DUMP_FILE 	= $(OUTPUT_DIR)/$(TEST_NAME).dump
+ASM_FILE 	= $(ASSEMBLY_DIR)/$(ASM_TEST).s
+OBJ_FILE 	= $(ASSEMBLY_BUILD_DIR)/asm_test.o
+ELF_FILE 	= $(ASSEMBLY_BUILD_DIR)/asm_test.elf
+BIN_FILE 	= $(ASSEMBLY_BUILD_DIR)/asm_test.bin
+HEX_FILE 	= $(ASSEMBLY_BUILD_DIR)/asm_test.hex
+DUMP_FILE 	= $(ASSEMBLY_BUILD_DIR)/asm_test.dump
 
 
 VERILOG_SOURCES += \
@@ -49,7 +49,7 @@ VERILOG_SOURCES += \
 VERILATOR_FLAGS = \
 	#-Wall
 # VERILATOR_ARGS += +vmem+if_id_ex_stage.instruction_rom.mem=test.hex
-VERILATOR_ARGS += +vmem+$(OUTPUT_DIR)/test.hex
+VERILATOR_ARGS += +vmem+$(HEX_FILE)
 
 # TOPLEVEL is the name of the toplevel module in your Verilog or VHDL file
 TOPLEVEL        = $(DUT)
@@ -80,6 +80,7 @@ stats:
 bin: $(BIN_FILE)
 
 $(OBJ_FILE): $(ASM_FILE)
+	mkdir -p $(ASSEMBLY_BUILD_DIR)
 	$(RISCV_AS) $(ARCH) -o $@ $<
 
 $(ELF_FILE): $(OBJ_FILE)
@@ -97,4 +98,4 @@ clean::
 	rm -rf ./sim_build
 	rm -rf dump.vcd
 	rm -rf results.xml
-	rm -f $(OBJ_FILE) $(ELF_FILE) $(BIN_FILE) $(HEX_FILE) $(DUMP_FILE)
+	rm -rf $(ASSEMBLY_BUILD_DIR)

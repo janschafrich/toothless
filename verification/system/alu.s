@@ -12,9 +12,16 @@ _start:
     and x7, x5, x3      # '1111' AND '0011' = '0011'
     bne x3, x7, fail
     li x30, 12      # load '1100' into x30
-    li x1, 0x10000
-    li x2, -1
-    li x3, 0xFACE
+    li x8, 0x10000
+    li x9, -1
+    li x10, 0xFACE
+    sub x11, x5, x9 # 0xF - (-1) = 0x10 
+    li x12, 0x10
+    bne x12, x11, fail
+    add x13, x9, x10    # -1 + 0xFACE = 0xFACD
+    li x14, 0xFACD
+    bne x13, x14, fail
+    
 
     j success
     
