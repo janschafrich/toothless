@@ -22,13 +22,11 @@ module program_counter #(
 	output logic [INSTR_WIDTH-1:0]pc_plus4_o		// link address for JALR, MUX to RD
 );
 	
-	// logic [31:0]	pc_next;
 	
 	always_ff @(posedge clk)
 	begin	
 		if (!rst_n) begin
-			pc_o		<= 0;
-			// pc_o		<= 'h10074;
+			pc_o		<= 'h10074;				// from test.dump - start address of .text section
 		end 
 		else begin
 
