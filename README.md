@@ -1,18 +1,17 @@
-# toothless - Mission
+# toothless 
+
+Single stage RV32I processor core. 
+
+![](docs/blockdiagram-toothless.png)
+
+
+## Mission
 
 - design  minimal RV32I core
 - test it - verilator
 - do logic synthesis - yosys
 - do physical synthesis - yosys
 - try SystemVerilog assertions
-
-# Core - Toothless
-
-instruction fetch
-decoder
-alu
-lsu
-regfile
 
 
 # Simulation cocotb (Python) + Verilator (Verilator >= 5.22)
@@ -50,7 +49,7 @@ make waves
 
 create test.hex from test.s
 ```
-make bin
+make bin ASM_TEST=alu
 ```
 run test.hex
 ```
@@ -69,7 +68,7 @@ cd rtl
 make stats
 ```
 
-perform full synthesis with default library
+perform logic synthesis with default library
 ```
 cd synthesis
 ./syn.sh

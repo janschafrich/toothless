@@ -1,0 +1,19 @@
+9. Printing statistics.
+
+=== if_id_ex_stage ===
+
+   Number of wires:                 81
+   Number of wire bits:           1102
+   Number of public wires:          81
+   Number of public wire bits:    1102
+   Number of ports:                  5
+   Number of port bits:             67
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                  0
+
+Warnings: 15 unique messages, 15 total
+End of script. Logfile hash: 1bbe7ff8e6, CPU: user 46.16s system 0.06s, MEM: 105.12 MB peak
+Yosys 0.50+56 (git sha1 9106d6b3b, clang++ 18.1.8 -fPIC -O3)
+Time spent: 96% 2x read_slang (44 sec), 0% 32x opt_expr (0 sec), ...
