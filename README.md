@@ -22,7 +22,6 @@ Setup Verilator Path
 export VERILATOR_ROOT=/home/jscha/projects/verilator
 export PATH=$VERILATOR_ROOT/bin:$PATH
 export PATH=/home/jscha/.config/mlonmcu/environments/default/deps/install/riscv_gcc/bin:$PATH
-export PATH="/home/jscha/projects/oss-cad-suite/bin:$PATH"
 ```
 
 Check for Syntax Errors
@@ -47,6 +46,11 @@ make waves
 
 ## Simulate Hex File / Assembly
 
+Setup compiler path
+```
+export PATH=/home/jscha/.config/mlonmcu/environments/default/deps/install/riscv_gcc/bin:$PATH
+```
+
 create test.hex from test.s
 ```
 make bin ASM_TEST=alu
@@ -61,17 +65,29 @@ make DUT=if_id_ex_stage
 
 - uses synthesis script `synthesis/syn.sh`
 - Need to manually specify source files inside script
+- nned to manually specifyy PDK path inside script
 
-Get yosys statistics
+
+perform logic synthesis with SKY130 library
 ```
-cd rtl
-make stats
+make syn
 ```
 
-perform logic synthesis with default library
+Synthesis with Sky130 nm
+
+## Compile PDK with OpenPDK
+Skywater130 nm PDK
+OpenPDK: setup of PDKs for open source tools from foundry sources
+
+
+
+## Compile SRAM / ROM macros for SKY130 with OpenRAM
+
+Generation of RAM/ROM macros
 ```
-cd synthesis
-./syn.sh
+export OPENRAM_HOME="/home/jscha/projects/OpenRAM/compiler"
+export OPENRAM_TECH="/home/jscha/projects/OpenRAM/technology"
+export PYTHONPATH="$PYTHONPATH:$OPENRAM_HOME"
 ```
 
 

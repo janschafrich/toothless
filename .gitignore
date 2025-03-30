@@ -19,3 +19,4 @@ verification/system/build
 
 synthesis/stat.log
 synthesis/*.v
+synthesis/*.constr

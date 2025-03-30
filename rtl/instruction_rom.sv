@@ -1,32 +1,54 @@
-// Instruction Memory - read only
-//
-// little endian - used by x86, ARM, RISCV default
-//  32bit integer:  A0B0C0D0
-//  byte addresses: n+3 n+2 n+1 n
-
-
+// Instruction ROM using OpenRAM SRAM
+// Uses little endian byte order
 module instruction_rom #(
-    parameter DATA_WIDTH    = 32,
-    parameter ADDR_WIDTH    = 32,
-    parameter LAU           = 8,     // least addressable unit 8 bit, 1 byte
-    parameter SIZE_LAU      = 2**20,  // in LAU
-    localparam N_BYTES      = DATA_WIDTH / LAU
+    parameter DATA_WIDTH = 32,
+    parameter ADDR_WIDTH = 32,
+    parameter LAU = 8 // least addressable unit 8 bit, 1 byte
 )
 (
-    input  logic [ADDR_WIDTH-1:0]   addr_i,
-    output logic [DATA_WIDTH-1:0]   data_o
+    input logic clk,
+    input logic [ADDR_WIDTH-1:0] addr_i,
+    output logic [DATA_WIDTH-1:0] data_o
 );
+    // Calculate SRAM address by word (32-bit) instead of by byte
+    wire [7:0] sram_addr = addr_i[9:2]; // 256 words (8-bit address)
     
-    logic [LAU-1:0] mem [0:SIZE_LAU-1] /* verilator public_flat_rw */;
-
-    assign data_o[7:0]   = mem[addr_i];
-    assign data_o[15:8]  = mem[addr_i+1];
-    assign data_o[23:16] = mem[addr_i+2];
-    assign data_o[31:24] = mem[addr_i+3];
-
-    // load machine code to execute during simulation
+    // Control signals
+    wire sram_csb = 1'b0; // Chip select (active low) - always enabled
+    wire sram_web = 1'b1; // Write enable (active low) - always in read mode for ROM
+    wire [3:0] sram_wmask = 4'b0000; // Write mask - not used for ROM
+    wire [31:0] sram_din = 32'h0; // Data input - not used for ROM
+    
+    // Unused second port signals
+    wire sram_csb1 = 1'b1; // Disable second port
+    wire [7:0] sram_addr1 = 8'b0;
+    wire [31:0] sram_dout1; // Unused output
+    
+    // Instantiate the SRAM macro
+    sram_1rw1r_32_256_8_sky130 instruction_sram (
+        // Port 0: RW port (used as read-only)
+        .clk0(clk),
+        .csb0(sram_csb),
+        .web0(sram_web),
+        .wmask0(sram_wmask),
+        .addr0(sram_addr),
+        .din0(sram_din),
+        .dout0(data_o),
+        
+        // Port 1: R port (unused)
+        .clk1(clk),
+        .csb1(sram_csb1),
+        .addr1(sram_addr1),
+        .dout1(sram_dout1)
+    );
+    
+    // Memory initialization
+    // For simulation only - will be ignored during synthesis
+    `ifdef SIMULATION
     initial begin
-        $readmemh("verification/system/build/asm_test.hex", mem);
+        // Initialize from hex file
+        $readmemh("verification/system/build/asm_test.hex", instruction_sram.mem);
     end
-
+    `endif
+    
 endmodule

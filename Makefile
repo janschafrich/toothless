@@ -49,7 +49,8 @@ VERILOG_SOURCES += \
 VERILATOR_FLAGS = \
 	#-Wall
 # VERILATOR_ARGS += +vmem+if_id_ex_stage.instruction_rom.mem=test.hex
-VERILATOR_ARGS += +vmem+$(HEX_FILE)
+# SIMULATION used in instruction_rom to differentiate between SIMULATION and synthesis
+VERILATOR_ARGS += +vmem+$(HEX_FILE) -DSIMULATION
 
 # TOPLEVEL is the name of the toplevel module in your Verilog or VHDL file
 TOPLEVEL        = $(DUT)
@@ -71,9 +72,9 @@ waves: dump.vcd
 	gtkwave dump.vcd &
 
 
-.PHONY:stats
-stats:
-	$(SYNTHESIS_DIR)/syn.sh stats
+.PHONY:syn
+syn:
+	$(SYNTHESIS_DIR)/syn.sh syn
 	
 
 .PHONY: bin
@@ -99,3 +100,4 @@ clean::
 	rm -rf dump.vcd
 	rm -rf results.xml
 	rm -rf $(ASSEMBLY_BUILD_DIR)
+	rm -rf $(SYNTHESIS_DIR)/outputs

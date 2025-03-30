@@ -10,6 +10,13 @@ TOOTHLESS_ROOT=/home/jscha/projects/toothless
 
 RTL_DIR=$TOOTHLESS_ROOT/rtl
 SYN_DIR=$TOOTHLESS_ROOT/synthesis
+PDK_ROOT=/usr/local/share/pdk # Update this to your PDK location
+# process corners: slow, typical, fast for NMOS / PMOS
+# operating environment:
+# best case: n40c = low resistance, high voltage (1.8 V) = fast propagation, worst case: 105c (high resistance), low voltage (1.65 V) = slow propagation 
+# cell library: choose typical process variations at typical operating conditions (25c, 1.8 V)
+STD_CELL_LIB=$PDK_ROOT/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
 
 
 RTL_SRC="$RTL_DIR/toothless_pkg.sv \
@@ -36,11 +43,9 @@ fi
 
 if [[ "$TASK" == "syn" ]]
 then
-        yosys -l stat.log -p "plugin -i slang; \
-                read_slang $RTL_SRC; \
-                hierarchy -top $TOP; \
-                proc; opt; techmap; opt; \
-                write_verilog $SYN_DIR/$TOP-netlist.v; \
-                synth; \
-                stat"
+        # mkdir -p $SYN_DIR/outputs
+        yosys $SYN_DIR/syn.tcl
 fi
+
+
+

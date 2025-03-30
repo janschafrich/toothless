@@ -230,8 +230,7 @@ always_comb begin: instruction_decoder
             alu_op_b_mux_sel_o  = ALU_OP_B_SEL_REG;
 
             ctrl_trans_instr_o = CTRL_TRANS_SEL_BRANCH;
-
-            // offset, to program counter ?
+            
             imm_valid_o = 1'b1;
             imm_o[31:12]= { 20{instr_i[31]} };
             imm_o[11]   = instr_i[7];

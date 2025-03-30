@@ -22,7 +22,7 @@ module alu #(
     assign operand_b_negate = ( operator_i == ALU_SUB ) ||
                               ( operator_i == ALU_SUBU );
 
-    assign operand_b_twos_compl = (~operand_b_i) + 1;
+    assign operand_b_twos_compl = (~operand_b_i) + 1;       // convert to negative number
 
     // MUX
     assign adder_op_b = operand_b_negate ? operand_b_twos_compl : operand_b_i;
@@ -63,6 +63,5 @@ module alu #(
 
         endcase
     end
-
 
 endmodule
