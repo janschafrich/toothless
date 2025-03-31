@@ -26,14 +26,13 @@ export PATH=/home/jscha/.config/mlonmcu/environments/default/deps/install/riscv_
 
 Check for Syntax Errors
 ```
-make lint DUT=decoder
+make lint TOP=decoder
 ```
 
 Run Simulation
 
 ```
-cd rtl
-make DUT=alu
+make TOP=alu
 ```
 
 
@@ -51,13 +50,18 @@ Setup compiler path
 export PATH=/home/jscha/.config/mlonmcu/environments/default/deps/install/riscv_gcc/bin:$PATH
 ```
 
+remove old Verilator model (Verialtor may not detect changes and run with an outdated model)
+```
+make clean
+```
+
 create test.hex from test.s
 ```
 make bin ASM_TEST=alu
 ```
-run test.hex
+run compiled assembly
 ```
-make DUT=if_id_ex_stage
+make TOP=if_id_ex_stage
 ```
 
 

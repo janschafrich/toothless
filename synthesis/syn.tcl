@@ -1,10 +1,17 @@
 # Synthesis script to be used with Yosys
 # https://github.com/asinghani/open-eda-course/blob/main/yosys-tutorial/yosys-tutorial.md
 
-# set TOP             sram_1rw1r_32_256_8_sky130
-# set TOP               instruction_rom
+set TOP               instruction_rom
+# set TOP               [lindex $argv 0]
 # set TOP             if_id_ex_stage
-set TOP             program_counter
+# set TOP             program_counter
+
+
+# if {[info exists ::TOP]} {
+#     set top $::TOP
+# } else {
+#     set top instruction_rom # Default value
+# }
 
 # relative to Makefile loacted in TOOTHLESS root
 set RTL_DIR         rtl
@@ -19,7 +26,7 @@ set SRAM_LIB        $PDK_DIR/sky130A/libs.ref/sky130_sram_macros/sram_1rw1r_32_2
 
 
 # init
-file mkdir $OUT_DIR
+file mkdir $OUT_DIR     # create OUT_DIR
 
 
 # load SystemVerilog frontend
@@ -27,14 +34,14 @@ yosys plugin -i slang.so
 
 
 # read memory macro
+yosys read_slang $RTL_DIR/toothless_pkg.sv -Weverything
 yosys read_slang $RTL_DIR/sram_1rw1r_32_256_8_sky130.sv -Weverything
 yosys blackbox sram_1rw1r_32_256_8_sky130
 
 
 # readl RTL with simulation disabled for synthesis
-# yosys read_slang -D SYNTHESIS ../rtl/toothless_pkg.sv ../rtl/$TOP.sv -Weverything
 # yosys read_slang $RTL_DIR/*.sv -Weverything
-yosys read_slang $RTL_DIR/toothless_pkg.sv $RTL_DIR/program_counter.sv -Weverything
+yosys read_slang $RTL_DIR/$TOP.sv -Weverything
 
 # Basic optimizations
 yosys hierarchy -check -top $TOP

@@ -4,11 +4,10 @@ export PYTHONPATH 		:= $(PWD)/verification/unittests:$(PYTHONPATH)
 # export VERILATOR_ROOT 	:= /home/jscha/projects/verilator
 # export $(PATH)				:= $(VERILATOR_ROOT)/bin:$(PATH)
 
-DUT				?= if_id_ex_stage
-ASM_TEST 		?= test
+TOP				?= if_id_ex_stage
+ASM_TEST 		?= alu
 SIM             ?= verilator
 TOPLEVEL_LANG   ?= verilog
-EXTRA_ARGS      += --trace --trace-structs
 
 RTL_DIR 		= $(PWD)/rtl
 UNITTESTS_DIR   = verification/unittests
@@ -16,6 +15,20 @@ SYSTEMTESTS_DIR = $(PWD)/verification/system
 SYNTHESIS_DIR   = $(PWD)/synthesis
 ASSEMBLY_DIR 	= verification/system
 ASSEMBLY_BUILD_DIR 	= $(ASSEMBLY_DIR)/build
+
+VERILOG_SOURCES += \
+	$(RTL_DIR)/toothless_pkg.sv \
+	$(RTL_DIR)/top.sv \
+	$(RTL_DIR)/if_id_ex_stage.sv \
+	$(RTL_DIR)/alu.sv \
+	$(RTL_DIR)/control_unit.sv \
+	$(RTL_DIR)/decoder.sv \
+	$(RTL_DIR)/instruction_rom.sv \
+	$(RTL_DIR)/sram_1rw1r_32_256_8_sky130.sv \
+	$(RTL_DIR)/load_store_unit.sv \
+	$(RTL_DIR)/data_tcm.sv \
+	$(RTL_DIR)/program_counter.sv \
+	$(RTL_DIR)/register_file.sv \
 
 # assembly compilation
 RISCV_GCC 		= riscv32-unknown-elf-gcc
@@ -33,37 +46,25 @@ HEX_FILE 	= $(ASSEMBLY_BUILD_DIR)/asm_test.hex
 DUMP_FILE 	= $(ASSEMBLY_BUILD_DIR)/asm_test.dump
 
 
-VERILOG_SOURCES += \
-	$(RTL_DIR)/toothless_pkg.sv \
-	$(RTL_DIR)/top.sv \
-	$(RTL_DIR)/if_id_ex_stage.sv \
-	$(RTL_DIR)/alu.sv \
-	$(RTL_DIR)/control_unit.sv \
-	$(RTL_DIR)/decoder.sv \
-	$(RTL_DIR)/instruction_rom.sv \
-	$(RTL_DIR)/load_store_unit.sv \
-	$(RTL_DIR)/data_tcm.sv \
-	$(RTL_DIR)/program_counter.sv \
-	$(RTL_DIR)/register_file.sv \
+
 
 VERILATOR_FLAGS = \
 	#-Wall
 # VERILATOR_ARGS += +vmem+if_id_ex_stage.instruction_rom.mem=test.hex
-# SIMULATION used in instruction_rom to differentiate between SIMULATION and synthesis
-VERILATOR_ARGS += +vmem+$(HEX_FILE) -DSIMULATION
-
+VERILATOR_ARGS += +vmem+$(HEX_FILE)
 # TOPLEVEL is the name of the toplevel module in your Verilog or VHDL file
-TOPLEVEL        = $(DUT)
-
+TOPLEVEL        = $(TOP)
 # MODULE is the basename of the Python test file
-MODULE          = tb_$(DUT)
+MODULE          = tb_$(TOP)
+# SIMULATION used in instruction_rom to differentiate between SIMULATION and synthesis
+EXTRA_ARGS      += --trace --trace-structs -DSIMULATION
 
 # include cocotb's make rules to take care of the simulator setup
 include $(shell cocotb-config --makefiles)/Makefile.sim
 
 
 .PHONY:lint
-lint: $(RTL_DIR)/$(DUT).sv
+lint: $(RTL_DIR)/$(TOP).sv
 	verilator --lint-only $(VERILATOR_FLAGS) $(VERILATOR_ARGS) $(VERILOG_SOURCES) 
 
 
@@ -74,7 +75,7 @@ waves: dump.vcd
 
 .PHONY:syn
 syn:
-	$(SYNTHESIS_DIR)/syn.sh syn
+	$(SYNTHESIS_DIR)/syn.sh $(TOP) syn
 	
 
 .PHONY: bin

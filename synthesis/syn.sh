@@ -1,16 +1,17 @@
 #! /bin/bash
 
-TASK=${1:-syn}         # stats,  syn
+TOP=${1:-instruction_rom}         # stats,  syn
+TASK=${2:-syn}
 
 export PATH="/home/jscha/projects/oss-cad-suite/bin:$PATH"
 
-TOP=if_id_ex_stage
 
 TOOTHLESS_ROOT=/home/jscha/projects/toothless
 
 RTL_DIR=$TOOTHLESS_ROOT/rtl
 SYN_DIR=$TOOTHLESS_ROOT/synthesis
 PDK_ROOT=/usr/local/share/pdk # Update this to your PDK location
+
 # process corners: slow, typical, fast for NMOS / PMOS
 # operating environment:
 # best case: n40c = low resistance, high voltage (1.8 V) = fast propagation, worst case: 105c (high resistance), low voltage (1.65 V) = slow propagation 
@@ -43,8 +44,8 @@ fi
 
 if [[ "$TASK" == "syn" ]]
 then
-        # mkdir -p $SYN_DIR/outputs
-        yosys $SYN_DIR/syn.tcl
+        yosys -c "$SYN_DIR/syn.tcl"
+        # yosys -c "$SYN_DIR/syn.tcl" -DTOP=$TOP
 fi
 
 

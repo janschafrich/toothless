@@ -42,11 +42,12 @@ module instruction_rom #(
         .dout1(sram_dout1)
     );
     
+
     // Memory initialization
     // For simulation only - will be ignored during synthesis
+    // macro "VERILATOR" is defined automatically during compilation
     `ifdef SIMULATION
     initial begin
-        // Initialize from hex file
         $readmemh("verification/system/build/asm_test.hex", instruction_sram.mem);
     end
     `endif

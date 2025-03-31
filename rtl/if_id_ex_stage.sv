@@ -72,6 +72,7 @@ module if_id_ex_stage #(
 
     // module instantiations
     instruction_rom #() instruction_rom_i (
+        .clk   (clk),
         .addr_i(pc),
         .data_o(cur_instr)
     ) ;
