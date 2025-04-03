@@ -26,7 +26,11 @@ module program_counter #(
 	always_ff @(posedge clk)
 	begin	
 		if (!rst_n) begin
+`ifdef SIMULATION
 			pc_o		<= 'h10074;				// from test.dump - start address of .text section
+`else
+			pc_o		<= 'h0;				
+`endif
 		end 
 		else begin
 

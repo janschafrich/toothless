@@ -5,7 +5,7 @@ export PYTHONPATH 		:= $(PWD)/verification/unittests:$(PYTHONPATH)
 # export $(PATH)				:= $(VERILATOR_ROOT)/bin:$(PATH)
 
 TOP				?= if_id_ex_stage
-ASM_TEST 		?= alu
+ASM 			?= alu
 SIM             ?= verilator
 TOPLEVEL_LANG   ?= verilog
 
@@ -38,12 +38,12 @@ RISCV_OBJCOPY 	= riscv32-unknown-elf-objcopy
 RISCV_OBJDUMP 	= riscv32-unknown-elf-objdump
 
 ARCH = -march=rv32i -mabi=ilp32
-ASM_FILE 	= $(ASSEMBLY_DIR)/$(ASM_TEST).s
-OBJ_FILE 	= $(ASSEMBLY_BUILD_DIR)/asm_test.o
-ELF_FILE 	= $(ASSEMBLY_BUILD_DIR)/asm_test.elf
-BIN_FILE 	= $(ASSEMBLY_BUILD_DIR)/asm_test.bin
-HEX_FILE 	= $(ASSEMBLY_BUILD_DIR)/asm_test.hex
-DUMP_FILE 	= $(ASSEMBLY_BUILD_DIR)/asm_test.dump
+ASM_FILE 	= $(ASSEMBLY_DIR)/$(ASM).s
+OBJ_FILE 	= $(ASSEMBLY_BUILD_DIR)/test_program.o
+ELF_FILE 	= $(ASSEMBLY_BUILD_DIR)/test_program.elf
+BIN_FILE 	= $(ASSEMBLY_BUILD_DIR)/test_program.bin
+HEX_FILE 	= $(ASSEMBLY_BUILD_DIR)/test_program.hex
+DUMP_FILE 	= $(ASSEMBLY_BUILD_DIR)/test_program.dump
 
 
 

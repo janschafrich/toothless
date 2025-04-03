@@ -57,7 +57,7 @@ make clean
 
 create test.hex from test.s
 ```
-make bin ASM_TEST=alu
+make bin ASM=alu
 ```
 run compiled assembly
 ```
