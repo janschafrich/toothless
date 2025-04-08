@@ -1,3 +1,8 @@
+/*
+    RV32-I instruction decoder
+
+*/
+
 import toothless_pkg::*;
 
 module decoder #(

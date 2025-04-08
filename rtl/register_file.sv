@@ -1,5 +1,4 @@
 
-import toothless_pkg::*;
 
 module register_file #(
 	parameter REG_COUNT = 32,

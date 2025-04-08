@@ -1,3 +1,8 @@
+/*
+    Central file to define constants and special data types to be used by modules of the Toothless processor
+
+*/
+
 
 package toothless_pkg;
 

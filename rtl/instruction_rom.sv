@@ -4,8 +4,7 @@
 
 module instruction_rom #(
     parameter DATA_WIDTH = 32,
-    parameter ADDR_WIDTH = 32,
-    parameter WORD_WIDTH = 8
+    parameter ADDR_WIDTH = 32
 ) (
     input logic clk,
     input logic [ADDR_WIDTH-1:0] addr_i,
@@ -14,6 +13,7 @@ module instruction_rom #(
     
 `ifdef SIMULATION
 
+    localparam WORD_WIDTH = 8;
     localparam RAM_DEPTH = 1 << 20;
 
     logic [WORD_WIDTH-1:0] mem [0:RAM_DEPTH-1] /* verilator public_flat_rw */;
@@ -70,8 +70,7 @@ module instruction_rom #(
 `else
 
     // Calculate SRAM address by word (32-bit) instead of by byte
-    logic [7:0] sram_addr = addr_i[9:2]; // 256 words (8-bit address)
-
+    logic [7:0] sram_addr;
     // Control signals
     wire sram_csb = 1'b0;               // Chip select (active low) - always enabled
     wire sram_web = 1'b1;               // Write enable (active low) - always in read mode for ROM
@@ -83,6 +82,8 @@ module instruction_rom #(
     wire sram_csb1 = 1'b1;              // Disable second port
     wire [7:0] sram_addr1 = 8'b0;
     wire [31:0] sram_dout1;             // Unused output
+
+    assign sram_addr = addr_i[9:2]; // 256 words (8-bit address)
     
     // Instantiate the SRAM macro
     sram_1rw1r_32_256_8_sky130 instruction_sram (

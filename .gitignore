@@ -16,7 +16,5 @@ verification/unittests/__pycache__
 verification/system/build
 
 
-
-synthesis/stat.log
-synthesis/*.v
+synthesis/outputs
 synthesis/*.constr

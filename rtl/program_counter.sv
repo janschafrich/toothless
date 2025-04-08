@@ -1,3 +1,12 @@
+/*
+	Program Counter
+
+	expects 32 bit aligned instructions
+
+	currently no compressed instructions (16 bit) support
+
+*/
+
 
 import toothless_pkg::*;
 
@@ -21,7 +30,6 @@ module program_counter #(
 	output logic [INSTR_WIDTH-1:0]pc_o,
 	output logic [INSTR_WIDTH-1:0]pc_plus4_o		// link address for JALR, MUX to RD
 );
-	
 	
 	always_ff @(posedge clk)
 	begin	

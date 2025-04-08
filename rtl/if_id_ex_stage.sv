@@ -1,12 +1,10 @@
 /*
 
-Instruction Fetch, Instruction Decode and Exxcution in a single stage for now
+Instruction Fetch, Instruction Decode and Execution as a minimal starting point
 
 */
 
-
 import toothless_pkg::*;
-
 
 module if_id_ex_stage #(
     DATA_WIDTH  = 32,

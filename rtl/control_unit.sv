@@ -1,10 +1,12 @@
 /*
     Control Unit provides some glue logic between the modules
+    controls the select signal for several muxes to route signals correctly between modules,
+    depending on select signal provided by decoder
 
 
 */
-import toothless_pkg::*;
 
+import toothless_pkg::*;
 
 module control_unit # (
     parameter DATA_WIDTH = 32,

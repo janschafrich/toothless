@@ -23,7 +23,7 @@ module sram_1rw1r_32_256_8_sky130(
   input [DATA_WIDTH-1:0]  din0;
   output [DATA_WIDTH-1:0] dout0;
   input  clk1;                        // clock
-  input  csb1;                       // active low chip select
+  input  csb1;                        // active low chip select
   input [ADDR_WIDTH-1:0]  addr1;
   output [DATA_WIDTH-1:0] dout1;
 

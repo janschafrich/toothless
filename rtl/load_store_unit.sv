@@ -4,7 +4,6 @@
 //  32bit integer:  A0B0C0D0
 //  byte addresses: n+3 n+2 n+1 n
 
-import toothless_pkg::*;
 
 module load_store_unit #(
     parameter DATA_WIDTH = 32,
@@ -32,11 +31,7 @@ module load_store_unit #(
     logic [DATA_WIDTH-1:0]  rdata;
     logic [DATA_WIDTH-1:0]  rdata_ext;
 
-    data_tcm #(
-        .DATA_WIDTH(DATA_WIDTH),
-        .ADDR_WIDTH(ADDR_WIDTH),
-        .SIZE_LAU(1024)
-    )data_tcm_i (
+    data_tcm #()data_tcm_i (
         .clk    (clk),
         .data_i (wdata),
         .addr_i (addr_i),

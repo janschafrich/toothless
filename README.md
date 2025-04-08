@@ -11,7 +11,7 @@ Single stage RV32I processor core.
 - test it - verilator
 - do logic synthesis - yosys
 - do physical synthesis - yosys
-- try SystemVerilog assertions
+- try SystemVerilog assertions - symbyosis
 
 
 # Simulation cocotb (Python) + Verilator (Verilator >= 5.22)
@@ -34,9 +34,6 @@ Run Simulation
 ```
 make TOP=alu
 ```
-
-
-
 
 View Waveform (uses GTKwaves)
 ```
@@ -68,8 +65,8 @@ make TOP=if_id_ex_stage
 # Synthesis Yosys
 
 - uses synthesis script `synthesis/syn.sh`
-- Need to manually specify source files inside script
-- nned to manually specifyy PDK path inside script
+- specify top module there
+- specify path to PDK, macros there
 
 
 perform logic synthesis with SKY130 library
@@ -80,6 +77,7 @@ make syn
 Synthesis with Sky130 nm
 
 ## Compile PDK with OpenPDK
+
 Skywater130 nm PDK
 OpenPDK: setup of PDKs for open source tools from foundry sources
 
