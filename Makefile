@@ -24,7 +24,7 @@ VERILOG_SOURCES += \
 	$(RTL_DIR)/control_unit.sv \
 	$(RTL_DIR)/decoder.sv \
 	$(RTL_DIR)/instruction_rom.sv \
-	$(RTL_DIR)/sram_1rw1r_32_256_8_sky130.sv \
+	$(RTL_DIR)/ips/sram_1rw1r_32_256_8_sky130.sv \
 	$(RTL_DIR)/load_store_unit.sv \
 	$(RTL_DIR)/data_tcm.sv \
 	$(RTL_DIR)/program_counter.sv \
@@ -59,6 +59,9 @@ MODULE          = tb_$(TOP)
 # SIMULATION used in instruction_rom to differentiate between SIMULATION and synthesis
 EXTRA_ARGS      += --trace --trace-structs -DSIMULATION
 
+
+sim: $(HEX_FILE)
+
 # include cocotb's make rules to take care of the simulator setup
 include $(shell cocotb-config --makefiles)/Makefile.sim
 
@@ -79,7 +82,7 @@ syn:
 	
 
 .PHONY: bin
-bin: $(BIN_FILE)
+bin: clean-bin $(BIN_FILE)
 
 $(OBJ_FILE): $(ASM_FILE)
 	mkdir -p $(ASSEMBLY_BUILD_DIR)
@@ -102,3 +105,7 @@ clean::
 	rm -rf results.xml
 	rm -rf $(ASSEMBLY_BUILD_DIR)
 	rm -rf $(SYNTHESIS_DIR)/outputs
+
+.PHONY:clean-bin
+clean-bin:
+	@rm -f $(ASSEMBLY_BUILD_DIR)/*
