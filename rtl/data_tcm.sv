@@ -20,9 +20,9 @@ module data_tcm #(
 
 `ifdef SIMULATION
 
-    localparam LAU           = 8,     // least addressable unit 8 bit, 1 byte
-    localparam SIZE_LAU      = 1024,  // in LAU
-    localparam N_BYTES      = DATA_WIDTH / LAU
+    localparam LAU           = 8;     // least addressable unit 8 bit, 1 byte
+    localparam SIZE_LAU      = 1024;  // in LAU
+    localparam N_BYTES      = DATA_WIDTH / LAU;
 
     logic [LAU-1:0] mem [0:SIZE_LAU];
 
@@ -44,10 +44,8 @@ module data_tcm #(
 
 `else
 
-
    // Calculate SRAM address by word (32-bit) instead of by byte
     logic [7:0] sram_addr;
-
 
     // first port
     wire sram_csb = 1'b0;                // Chip select (active low) - always enabled

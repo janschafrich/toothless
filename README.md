@@ -64,6 +64,10 @@ make TOP=if_id_ex_stage
 
 # Synthesis Yosys
 
+```
+export PATH="/home/jscha/projects/oss-cad-suite/bin:$PATH"
+```
+
 - uses synthesis script `synthesis/syn.sh`
 - specify top module there
 - specify path to PDK, macros there

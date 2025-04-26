@@ -9,7 +9,6 @@ export PATH="/home/jscha/projects/oss-cad-suite/bin:$PATH"
 
 SYN_DIR=synthesis
 
-
 if [[ "$TASK" == "syn" ]]
 then
         yosys -c "$SYN_DIR/syn.tcl"

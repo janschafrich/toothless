@@ -5,7 +5,6 @@
 
 
 */
-
 import toothless_pkg::*;
 
 module control_unit # (

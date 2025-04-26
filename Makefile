@@ -4,7 +4,7 @@ export PYTHONPATH 		:= $(PWD)/verification/unittests:$(PYTHONPATH)
 # export VERILATOR_ROOT 	:= /home/jscha/projects/verilator
 # export $(PATH)				:= $(VERILATOR_ROOT)/bin:$(PATH)
 
-TOP				?= if_id_ex_stage
+TOP				?= top
 ASM 			?= alu
 SIM             ?= verilator
 TOPLEVEL_LANG   ?= verilog
@@ -59,8 +59,6 @@ MODULE          = tb_$(TOP)
 # SIMULATION used in instruction_rom to differentiate between SIMULATION and synthesis
 EXTRA_ARGS      += --trace --trace-structs -DSIMULATION
 
-
-sim: $(HEX_FILE)
 
 # include cocotb's make rules to take care of the simulator setup
 include $(shell cocotb-config --makefiles)/Makefile.sim

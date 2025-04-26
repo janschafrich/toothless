@@ -3,11 +3,13 @@
 # Yosys commands: https://yosyshq.readthedocs.io/projects/yosys/en/stable/cmd_ref.html
 
 # set TOP               [lindex $argv 0]
-set TOP             if_id_ex_stage
+# set TOP             if_id_ex_stage
+# set TOP             decoder
 # set TOP               instruction_rom
 # set TOP             load_store_unit
 # set TOP             program_counter
-
+# set TOP             register_file
+set TOP                 top
 
 # if {[info exists ::TOP]} {
 #     set top $::TOP
@@ -72,5 +74,5 @@ yosys abc -liberty $STD_CELL_LIB
 # Generate final outputs
 yosys write_verilog -sv -noattr $OUT_DIR/stage_final.sv
 yosys stat
-# yosys show
+yosys show
 # yosys show -format dot -prefix ${TOP}_mapped
