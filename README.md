@@ -97,6 +97,13 @@ export PYTHONPATH="$PYTHONPATH:$OPENRAM_HOME"
 ```
 
 
+# FPGA - Basys3 (Artix 7)
+
+- critical path estimated to be 92 ns by Vivado
+- debugging using output interfaces (7 Segment, 16 LEDs)
+
+
+
 
 
 

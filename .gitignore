@@ -1,6 +1,7 @@
 archive
 vivado
 utils
+fpga/docs
 
 obj_dir
 .stamp.verilate

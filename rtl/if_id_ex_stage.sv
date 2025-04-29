@@ -13,15 +13,15 @@ module if_id_ex_stage #(
 )(
     input  logic                    clk,
     input  logic                    rst_n,
-    output logic [INSTR_WIDTH-1:0]  cur_instr_o,
-    output logic [DATA_WIDTH-1:0]   result_o,
+    input  logic [INSTR_WIDTH-1:0]  instruction_i,
+    output logic [ADDR_WIDTH-1:0]   instr_addr_o,
     output logic                    instr_invalid_o
 );
 
     // Signal declarations
     // program counter
     logic [1:0] ctrl_trans_instr;
-    logic [ADDR_WIDTH-1:0] pc;
+    logic [ADDR_WIDTH-1:0] instr_addr;
 
     // program counter <-> decoder
     logic [INSTR_WIDTH-1:0]     cur_instr;
@@ -69,13 +69,6 @@ module if_id_ex_stage #(
 
 
     // module instantiations
-    instruction_rom #() instruction_rom_i (
-        .clk   (clk),
-        .addr_i(pc),
-        .data_o(cur_instr)
-    ) ;
-
-
     program_counter #(
         .INSTR_WIDTH (INSTR_WIDTH),
 	    .ADDR_WIDTH  (DATA_WIDTH)
@@ -86,7 +79,7 @@ module if_id_ex_stage #(
         .offset_i       (imm),                  // from decoder
         .branch_tkn_i   (alu_result[0]), 
         .tgt_addr_i     (alu_result),
-        .pc_o           (pc),
+        .pc_o           (instr_addr),
         .pc_plus4_o     (pc_plus4)
     );
 
@@ -95,7 +88,7 @@ module if_id_ex_stage #(
     ) decoder_i (
         .clk        (clk),
         .rst_n      (rst_n), 
-        .instr_i    (cur_instr),
+        .instr_i    (instruction_i),
 
         // ALU signals
         .alu_operator_o(alu_operator),              // select operation to be performed by ALU
@@ -124,7 +117,7 @@ module if_id_ex_stage #(
         .data_req_o(mem_data_req),                  // request data memory access
         .data_type_o(mem_data_type),                // word, half word, byte for LSU
         .data_we_o(mem_we),                         // write or read to memory
-        .data_sign_ext_o(mem_data_sign_ext),        // whether or not data from memory is to be sign extended
+        .data_sign_ext_o(mem_data_sign_ext), // has no driver // whether or not data from memory is to be sign extended
 
         .instr_invalid_o(instr_invalid_o)           // everything not part of RV32I is invalid
     );
@@ -177,7 +170,7 @@ module if_id_ex_stage #(
         .rf_wp_mux_sel_i        (rf_wp_mux_sel),
         .rf_wp_o                (rf_wp_a),
         // program counter
-        .pc_i                   (pc),
+        .pc_i                   (instr_addr),
         .pc_plus4_i             (pc_plus4),
 
         // 
@@ -205,10 +198,7 @@ module if_id_ex_stage #(
         .rdata_o        (mem_rdata)             // rd
     );
 
-
-    // for debugging
-    assign cur_instr_o = cur_instr;
-    assign result_o = alu_result;
+    assign instr_addr_o = instr_addr;
 
 
 endmodule
