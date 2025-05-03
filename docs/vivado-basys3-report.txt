@@ -1,0 +1,35 @@
+Report Cell Usage: 
++------+---------+------+
+|      |Cell     |Count |
++------+---------+------+
+|1     |BUFG     |     1|
+|2     |CARRY4   |    38|
+|3     |LUT1     |     3|
+|4     |LUT2     |    63|
+|5     |LUT3     |    98|
+|6     |LUT4     |   189|
+|7     |LUT5     |   133|
+|8     |LUT6     |  1071|
+|9     |MUXF7    |   256|
+|10    |MUXF8    |    74|
+|11    |RAMB18E1 |     2|
+|12    |FDRE     |  1180|
+|13    |LD       |     7|
+|14    |IBUF     |     2|
+|15    |OBUF     |    65|
++------+---------+------+
+
+Report Instance Areas: 
++------+---------------------+-----------------------------+------+
+|      |Instance             |Module                       |Cells |
++------+---------------------+-----------------------------+------+
+|1     |top                  |                             |  3182|
+|2     |  decoder_i          |decoder                      |   211|
+|3     |  instruction_rom_i  |instruction_rom              |   862|
+|4     |    instruction_sram |sram_1rw1r_32_256_8_sky130_0 |     9|
+|5     |  load_store_unit_i  |load_store_unit              |    88|
+|6     |    data_tcm_i       |data_tcm                     |    88|
+|7     |      data_sram      |sram_1rw1r_32_256_8_sky130   |    56|
+|8     |  program_counter_i  |program_counter              |    53|
+|9     |  register_file_i    |register_file                |  1899|
++------+---------------------+-----------------------------+------+
