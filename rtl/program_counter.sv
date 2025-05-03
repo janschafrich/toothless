@@ -8,9 +8,9 @@
 */
 
 
-import toothless_pkg::*;
-
-module program_counter #(
+module program_counter 
+	import toothless_pkg::*;
+#(
 	INSTR_WIDTH = 32,
 	ADDR_WIDTH 	= 32
 )

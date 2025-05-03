@@ -4,27 +4,52 @@ Instruction Fetch, Instruction Decode and Execution as a minimal starting point
 
 */
 
-import toothless_pkg::*;
 
-module if_id_ex_stage #(
+module if_id_ex_stage
+    import toothless_pkg::*;
+#(
     DATA_WIDTH  = 32,
     ADDR_WIDTH  = 32,
     INSTR_WIDTH = 32
 )(
     input  logic                    clk,
     input  logic                    rst_n,
+    output logic                    instr_invalid_o,
+
+    // instruction memory
     input  logic [INSTR_WIDTH-1:0]  instruction_i,
     output logic [ADDR_WIDTH-1:0]   instr_addr_o,
-    output logic                    instr_invalid_o
+
+    // to data cache / external memory
+    output logic [ADDR_WIDTH-1:0]   data_addr_o,
+    output logic                    data_we_o,           // 0 read access, 1 write access
+    output logic [1:0]              data_type_o,    // 00 byte, 01 halfword, 10 word
+    input  logic [DATA_WIDTH-1:0]   rdata_i,        // read from
+    output logic [3:0]              data_be_o,      // byte enable, one hot encoding
+    output logic [DATA_WIDTH-1:0]   wdata_o         // write to 
 );
 
-    // Signal declarations
     // program counter
+    logic [ADDR_WIDTH-1:0] pc_plus4;
     logic [1:0] ctrl_trans_instr;
     logic [ADDR_WIDTH-1:0] instr_addr;
+    logic [DATA_WIDTH-1:0]  imm;
+    logic [DATA_WIDTH-1:0] alu_result;
 
-    // program counter <-> decoder
-    logic [INSTR_WIDTH-1:0]     cur_instr;
+    program_counter #(
+        .INSTR_WIDTH (INSTR_WIDTH),
+	    .ADDR_WIDTH  (DATA_WIDTH)
+    ) program_counter_i (
+        .clk            (clk),
+        .rst_n          (rst_n),
+        .ctrl_trans_instr_i(ctrl_trans_instr),
+        .offset_i       (imm),                  // from decoder
+        .branch_tkn_i   (alu_result[0]), 
+        .tgt_addr_i     (alu_result),
+        .pc_o           (instr_addr),
+        .pc_plus4_o     (pc_plus4)              // control unit
+    );
+
 
     // decoder <-> alu
     alu_opcode_e    alu_operator;
@@ -39,50 +64,16 @@ module if_id_ex_stage #(
     logic [1:0]             alu_op_a_mux_sel;
     logic [1:0]             alu_op_b_mux_sel;
     logic [1:0]             rf_wp_mux_sel;
-    logic [DATA_WIDTH-1:0]  imm;
     logic                   imm_valid;
     logic                   rs1_valid;
     logic                   rs2_valid;
-
-    // alu <-> control unit
-    logic [DATA_WIDTH-1:0] alu_result;
-    logic [DATA_WIDTH-1:0] alu_operand_a; 
-    logic [DATA_WIDTH-1:0] alu_operand_b; 
-
-    // register file <-> control unit
-    logic [ADDR_WIDTH-1:0] rf_rp_a;
-    logic [ADDR_WIDTH-1:0] rf_rp_b;
-    logic [ADDR_WIDTH-1:0] rf_wp_a;
-
-    // control unit <-> program counter
-    logic [ADDR_WIDTH-1:0] pc_plus4;
 
     // decoder <-> load store unit
     logic                   mem_we;               // 0 read access, 1 write access
     logic                   mem_data_req;         // ongoing request to the LSU
     logic [1:0]             mem_data_type;        // 00 byte, 01 halfword, 10 word
     logic                   mem_data_sign_ext;    // sign extension or zero extension
-
-    // control <-> load store unit
-    logic [DATA_WIDTH-1:0]  mem_rdata;
-
-
-
-    // module instantiations
-    program_counter #(
-        .INSTR_WIDTH (INSTR_WIDTH),
-	    .ADDR_WIDTH  (DATA_WIDTH)
-    ) program_counter_i (
-        .clk            (clk),
-        .rst_n          (rst_n),
-        .ctrl_trans_instr_i(ctrl_trans_instr),
-        .offset_i       (imm),                  // from decoder
-        .branch_tkn_i   (alu_result[0]), 
-        .tgt_addr_i     (alu_result),
-        .pc_o           (instr_addr),
-        .pc_plus4_o     (pc_plus4)
-    );
-
+    
     decoder #(
         .DATA_WIDTH (DATA_WIDTH)
     ) decoder_i (
@@ -91,24 +82,24 @@ module if_id_ex_stage #(
         .instr_i    (instruction_i),
 
         // ALU signals
-        .alu_operator_o(alu_operator),              // select operation to be performed by ALU
+        .alu_operator_o(alu_operator),          // select operation to be performed by ALU
 
 
-        .imm_o(imm),           // sign/zero extended immediate value from current instruction
-        .imm_valid_o(imm_valid),       // whether current instruction has an immediate value
+        .imm_o(imm),                            // sign/zero extended immediate value from current instruction
+        .imm_valid_o(imm_valid),                // whether current instruction has an immediate value
 
         // register file signals
         .rs1_used_o(rs1_valid),
         .rs2_used_o(rs2_valid),
-        .rd_used_o(rf_we),                              // need register write
+        .rd_used_o(rf_we),                      // need register write
         .rs1_o(rs1),                                     
         .rs2_o(rs2), 
         .rd_o(rd),
 
         // controller signals
-        .alu_op_a_mux_sel_o(alu_op_a_mux_sel),          // operand a selection: reg, PC, immediate or zero
-        .alu_op_b_mux_sel_o(alu_op_b_mux_sel),           // operand b selection: reg or immediate
-        .rf_wp_mux_sel_o(rf_wp_mux_sel),                             // write source: 00 RF, 01 PC
+        .alu_op_a_mux_sel_o(alu_op_a_mux_sel),      // operand a selection: reg, PC, immediate or zero
+        .alu_op_b_mux_sel_o(alu_op_b_mux_sel),      // operand b selection: reg or immediate
+        .rf_wp_mux_sel_o(rf_wp_mux_sel),            // write source: 00 RF, 01 PC
 
         // program counter signals
         .ctrl_trans_instr_o(ctrl_trans_instr),      // current instr is control transfer, 00 none, 01 jump, 10 branch
@@ -123,6 +114,10 @@ module if_id_ex_stage #(
     );
 
 
+    // alu <-> control unit
+    logic [DATA_WIDTH-1:0] alu_operand_a; 
+    logic [DATA_WIDTH-1:0] alu_operand_b; 
+
     alu #(
         .DATA_WIDTH (DATA_WIDTH),
         .ALU_OP_WIDTH (ALU_OP_WIDTH)   
@@ -132,6 +127,12 @@ module if_id_ex_stage #(
         .operand_b_i(alu_operand_b),
         .result_o   (alu_result)
     );
+
+
+    // register file <-> control unit
+    logic [ADDR_WIDTH-1:0] rf_rp_a;
+    logic [ADDR_WIDTH-1:0] rf_rp_b;
+    logic [ADDR_WIDTH-1:0] rf_wp_a;
 
     register_file #(
         .REG_COUNT(32),
@@ -147,6 +148,10 @@ module if_id_ex_stage #(
         .wdata_a_i  (rf_wp_a),
         .we_a_i     (rf_we)
     );
+
+
+    // control <-> load store unit
+    logic [DATA_WIDTH-1:0]  mem_rdata;
 
     control_unit #(
         .DATA_WIDTH(DATA_WIDTH),
@@ -185,9 +190,8 @@ module if_id_ex_stage #(
         .clk(clk),
         
         // from decoder
-        .addr_i         (alu_result),
         .we_i           (mem_we),               // 0 read access, 1 write access
-        .data_req_i     (mem_data_req),          // ongoing request to the LSU
+        .data_req_i     (mem_data_req),         // ongoing request to the LSU
         .data_type_i    (mem_data_type),        // 00 byte, 01 halfword, 10 word
         .data_sign_ext_i(mem_data_sign_ext),    // load with sign extension
 
@@ -195,8 +199,16 @@ module if_id_ex_stage #(
         .wdata_i        (rf_rp_b),              // rs2 
 
         // loads - to register file
-        .rdata_o        (mem_rdata)             // rd
+        .rdata_o        (mem_rdata),             // rd
+
+        // to data cache / external memory
+        .rdata_i        (rdata_i),              // read from
+        .data_be_o      (data_be_o),            // byte enable, one hot encoding
+        .wdata_o        (wdata_o)               // write to 
     );
+
+    assign data_addr_o = alu_result;
+    assign data_we_o = mem_we;
 
     assign instr_addr_o = instr_addr;
 

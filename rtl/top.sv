@@ -2,30 +2,33 @@
 Copyright Jan-Eric Schäfrich 2025
 Part of Toothless
 
-Top level module which instantiates the whole processor. 
+Top level module which instantiates the whole soc and may provide some glue logic
+to interface with EDA tools in the future.  
 
 */
 
 
-import toothless_pkg::*;
 
 
-module top #(
+module top 
+    import toothless_pkg::*;
+#(
     parameter ADDR_WIDTH = 32,
-    parameter DATA_WIDTH = 32
+    parameter DATA_WIDTH = 32,
+    parameter INSTR_WIDTH = 32
 ) (
     input  logic clk,
-    input  logic rst_n
+    input  logic rst_n,
+    input  logic enable     // todo: pause execution at any time
 );
 
-    // single stage processor
-    if_id_ex_stage #() if_id_ex_stage_i(
+    soc #(
+        .DATA_WIDTH (DATA_WIDTH),   
+        .ADDR_WIDTH (ADDR_WIDTH),
+        .INSTR_WIDTH(INSTR_WIDTH)  
+    ) soc_i (
         .clk(clk),
-        .rst_n(rst_n),
-        .cur_instr_o(),
-        .result_o(),
-        .instr_invalid_o()
+        .rst_n(rst_n)
     );
-
 
 endmodule

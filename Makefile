@@ -19,14 +19,16 @@ ASSEMBLY_BUILD_DIR 	= $(ASSEMBLY_DIR)/build
 VERILOG_SOURCES += \
 	$(RTL_DIR)/toothless_pkg.sv \
 	$(RTL_DIR)/top.sv \
+	$(RTL_DIR)/soc.sv \
+	$(RTL_DIR)/core.sv \
 	$(RTL_DIR)/if_id_ex_stage.sv \
 	$(RTL_DIR)/alu.sv \
 	$(RTL_DIR)/control_unit.sv \
 	$(RTL_DIR)/decoder.sv \
-	$(RTL_DIR)/instruction_rom.sv \
-	$(RTL_DIR)/ips/sram_1rw1r_32_256_8_sky130.sv \
 	$(RTL_DIR)/load_store_unit.sv \
-	$(RTL_DIR)/data_tcm.sv \
+	$(RTL_DIR)/ips/sram_1rw1r_32_256_8_sky130.sv \
+	$(RTL_DIR)/icache.sv \
+	$(RTL_DIR)/dcache.sv \
 	$(RTL_DIR)/program_counter.sv \
 	$(RTL_DIR)/register_file.sv \
 

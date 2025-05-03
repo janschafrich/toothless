@@ -5,11 +5,12 @@
 # set TOP               [lindex $argv 0]
 # set TOP             if_id_ex_stage
 # set TOP             decoder
-# set TOP               instruction_rom
+# set TOP               icache
+# set TOP               dcache
 # set TOP             load_store_unit
 # set TOP             program_counter
 # set TOP             register_file
-set TOP                 top
+set TOP                 soc
 
 # if {[info exists ::TOP]} {
 #     set top $::TOP

@@ -5,13 +5,13 @@
 
 
 */
-import toothless_pkg::*;
 
-module control_unit # (
+module control_unit 
+    import toothless_pkg::*;
+#(
     parameter DATA_WIDTH = 32,
     parameter ADDR_WIDTH = 32
-)
-(
+)(
     // Decoder
     input  logic [1:0] alu_op_a_mux_sel_i,
     input  logic [1:0] alu_op_b_mux_sel_i,

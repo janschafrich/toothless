@@ -1,10 +1,10 @@
-// Data Tightly Coupled Memory 
+// Data Cache 
 //
 // little endian - used by x86, ARM, RISCV default
 //  32bit integer:  A0B0C0D0
 //  byte addresses: n+3 n+2 n+1 n
 
-module data_tcm #(
+module dcache #(
     parameter DATA_WIDTH    = 32,
     parameter ADDR_WIDTH    = 32
 ) (

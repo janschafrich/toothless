@@ -1,6 +1,7 @@
-import toothless_pkg::*;
 
-module alu #(
+module alu 
+    import toothless_pkg::*;
+#(
     parameter DATA_WIDTH = 32,
     parameter ALU_OP_WIDTH = 5
 )(

@@ -17,7 +17,7 @@ async def generate_clock(dut):
 
 
 @cocotb.test()
-async def test_data_tcm(dut):
+async def test_data_cache(dut):
 
     await cocotb.start(generate_clock(dut))     # run in background/parallel
 

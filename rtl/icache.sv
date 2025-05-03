@@ -2,13 +2,13 @@
 // Uses little endian byte order
 // https://cornell-ece5745.github.io/ece5745-tut8-sram/
 
-module instruction_rom #(
-    parameter DATA_WIDTH = 32,
-    parameter ADDR_WIDTH = 32
+module icache #(
+    parameter INSTR_WIDTH = 32,
+    parameter ADDR_WIDTH  = 32
 ) (
     input logic clk,
     input logic [ADDR_WIDTH-1:0] addr_i,
-    output logic [DATA_WIDTH-1:0] data_o
+    output logic [INSTR_WIDTH-1:0] data_o
 );
     
 `ifdef SIMULATION

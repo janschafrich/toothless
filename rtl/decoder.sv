@@ -3,9 +3,10 @@
 
 */
 
-import toothless_pkg::*;
 
-module decoder #(
+module decoder 
+    import toothless_pkg::*;
+#(
     parameter DATA_WIDTH = 32
 ) (
     input  logic clk,
